@@ -7,6 +7,8 @@ services:
         volumes:
             - ./mqtt:/app/data
             - /run/udev:/run/udev:ro
+        depends_on:
+            - mqtt
         ports:
             # Frontend port
             - 8081:8080
@@ -27,12 +29,15 @@ services:
         - ./mos_data:/mosquitto/data
         - ./mos_log:/mosquitto/log
         restart: unless-stopped
+
     kocom:
         container_name: kocom
         build:
             context: ./kocomRS485
             dockerfile: Dockerfile
         restart: unless-stopped
+        depends_on:
+            - mqtt
         volumes:
             - ./kocom/share:/share
             - ./kocom/data:/data
