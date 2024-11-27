@@ -1,0 +1,38 @@
+version: '3.8'
+services:
+    zigbee2mqtt:
+        container_name: zigbee2mqtt
+        image: koenkk/zigbee2mqtt
+        restart: unless-stopped
+        volumes:
+            - ./mqtt:/app/data
+            - /run/udev:/run/udev:ro
+        ports:
+            # Frontend port
+            - 8081:8080
+        environment:
+            - TZ=Aisa/Seoul
+        devices:
+            # Make sure this matched your adapter location
+            - /dev/serial/by-id/usb-Silicon_Labs_Sonoff_Zigbee_3.0_USB_Dongle_Plus_0001-if00-port0:/dev/ttyACM0
+
+    mqtt:
+        container_name: mqtt
+        image: "eclipse-mosquitto"
+        ports:
+        - "1883:1883"
+        - "9001:9001"
+        volumes:
+        - ./mos_config/mosquitto.conf:/mosquitto/config/mosquitto.conf
+        - ./mos_data:/mosquitto/data
+        - ./mos_log:/mosquitto/log
+        restart: unless-stopped
+    kocom:
+        container_name: kocom
+        build:
+            context: ./kocomRS485
+            dockerfile: Dockerfile
+        restart: unless-stopped
+        volumes:
+            - ./kocom/share:/share
+            - ./kocom/data:/data

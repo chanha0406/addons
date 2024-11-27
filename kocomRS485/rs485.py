@@ -30,10 +30,10 @@ CONF_LOGLEVEL = 'info' # debug, info, warn
 # 보일러 초기값
 INIT_TEMP = 22
 # 환풍기 초기속도 ['low', 'medium', 'high']
-DEFAULT_SPEED = 'medium'
+DEFAULT_SPEED = 2
 # 조명 / 플러그 갯수
-KOCOM_LIGHT_SIZE            = {'livingroom': 3, 'bedroom': 2, 'room1': 2, 'room2': 2, 'kitchen': 3}
-KOCOM_PLUG_SIZE             = {'livingroom': 2, 'bedroom': 2, 'room1': 2, 'room2': 2, 'kitchen': 2}
+KOCOM_LIGHT_SIZE            = {'livingroom': 5, 'bedroom': 0, 'room1': 0, 'room2': 0, 'kitchen': 0}
+KOCOM_PLUG_SIZE             = {'livingroom': 0, 'bedroom': 0, 'room1': 0, 'room2': 0, 'kitchen': 0}
 
 # 방 패킷에 따른 방이름 (패킷1: 방이름1, 패킷2: 방이름2 . . .)
 # 월패드에서 장치를 작동하며 방이름(livingroom, bedroom, room1, room2, kitchen 등)을 확인하여 본인의 상황에 맞게 바꾸세요
@@ -112,7 +112,7 @@ DEVICE_FAN = 'fan'
 KOCOM_DEVICE                = {'01': DEVICE_WALLPAD, '0e': DEVICE_LIGHT, '36': DEVICE_THERMOSTAT, '3b': DEVICE_PLUG, '44': DEVICE_ELEVATOR, '2c': DEVICE_GAS, '48': DEVICE_FAN}
 KOCOM_COMMAND               = {'3a': '조회', '00': '상태', '01': 'on', '02': 'off'}
 KOCOM_TYPE                  = {'30b': 'send', '30d': 'ack'}
-KOCOM_FAN_SPEED             = {'4': 'low', '8': 'medium', 'c': 'high', '0': 'off'}
+KOCOM_FAN_SPEED             = {'4': 1, '8': 2, 'c': 3, '0': 0}
 KOCOM_DEVICE_REV            = {v: k for k, v in KOCOM_DEVICE.items()}
 KOCOM_ROOM_REV              = {v: k for k, v in KOCOM_ROOM.items()}
 KOCOM_ROOM_THERMOSTAT_REV   = {v: k for k, v in KOCOM_ROOM_THERMOSTAT.items()}
@@ -497,10 +497,14 @@ class Kocom(rs485):
             room = topic[2]
             try:
                 if command != 'mode':
-                    self.wp_list[device][room]['speed']['set'] = payload
-                    self.wp_list[device][room]['mode']['set'] = 'on'
+                    if 0 < int(payload) <= 3:
+                        self.wp_list[device][room]['speed']['set'] = int(payload)
+                        self.wp_list[device][room]['mode']['set'] = 'on'
+                    else:
+                        self.wp_list[device][room]['speed']['set'] = int(payload)
+                        self.wp_list[device][room]['mode']['set'] = 'off'
                 elif command == 'mode':
-                    self.wp_list[device][room]['speed']['set'] = DEFAULT_SPEED if payload == 'on' else 'off'
+                    self.wp_list[device][room]['speed']['set'] = DEFAULT_SPEED if payload == 'on' else 0
                     self.wp_list[device][room]['mode']['set'] = payload
                 self.wp_list[device][room]['speed']['last'] = 'set'
                 self.wp_list[device][room]['mode']['last'] = 'set'
@@ -548,9 +552,9 @@ class Kocom(rs485):
             ha_topic = '{}/{}/{}_{}/config'.format(HA_PREFIX, HA_SWITCH, 'wallpad', DEVICE_ELEVATOR)
             ha_payload = {
                 'name': '{}_{}_{}'.format(self._name, 'wallpad', DEVICE_ELEVATOR),
-                'cmd_t': '{}/{}/{}_{}/set'.format(HA_PREFIX, HA_SWITCH, 'wallpad', DEVICE_ELEVATOR),
-                'stat_t': '{}/{}/{}/state'.format(HA_PREFIX, HA_SWITCH, 'wallpad'),
-                'val_tpl': '{{ value_json.' + DEVICE_ELEVATOR + ' }}',
+                'command_topic': '{}/{}/{}_{}/set'.format(HA_PREFIX, HA_SWITCH, 'wallpad', DEVICE_ELEVATOR),
+                'state_topic': '{}/{}/{}/state'.format(HA_PREFIX, HA_SWITCH, 'wallpad'),
+                'value_template': '{{ value_json.' + DEVICE_ELEVATOR + ' }}',
                 'ic': 'mdi:elevator',
                 'pl_on': 'on',
                 'pl_off': 'off',
@@ -564,8 +568,8 @@ class Kocom(rs485):
                 }
             }
             subscribe_list.append((ha_topic, 0))
-            subscribe_list.append((ha_payload['cmd_t'], 0))
-            #subscribe_list.append((ha_payload['stat_t'], 0))
+            subscribe_list.append((ha_payload['command_topic'], 0))
+            #subscribe_list.append((ha_payload['state_topic'], 0))
             if remove:
                 publish_list.append({ha_topic : ''})
             else:
@@ -574,9 +578,9 @@ class Kocom(rs485):
             ha_topic = '{}/{}/{}_{}/config'.format(HA_PREFIX, HA_SWITCH, 'wallpad', DEVICE_GAS)
             ha_payload = {
                 'name': '{}_{}_{}'.format(self._name, 'wallpad', DEVICE_GAS),
-                'cmd_t': '{}/{}/{}_{}/set'.format(HA_PREFIX, HA_SWITCH, 'wallpad', DEVICE_GAS),
-                'stat_t': '{}/{}/{}_{}/state'.format(HA_PREFIX, HA_SWITCH, 'wallpad', DEVICE_GAS),
-                'val_tpl': '{{ value_json.' + DEVICE_GAS + ' }}',
+                'command_topic': '{}/{}/{}_{}/set'.format(HA_PREFIX, HA_SWITCH, 'wallpad', DEVICE_GAS),
+                'state_topic': '{}/{}/{}_{}/state'.format(HA_PREFIX, HA_SWITCH, 'wallpad', DEVICE_GAS),
+                'value_template': '{{ value_json.' + DEVICE_GAS + ' }}',
                 'ic': 'mdi:gas-cylinder',
                 'pl_on': 'on',
                 'pl_off': 'off',
@@ -590,8 +594,8 @@ class Kocom(rs485):
                 }
             }
             subscribe_list.append((ha_topic, 0))
-            subscribe_list.append((ha_payload['cmd_t'], 0))
-            #subscribe_list.append((ha_payload['stat_t'], 0))
+            subscribe_list.append((ha_payload['command_topic'], 0))
+            #subscribe_list.append((ha_payload['state_topic'], 0))
             if remove:
                 publish_list.append({ha_topic : ''})
             else:
@@ -600,8 +604,8 @@ class Kocom(rs485):
             ha_topic = '{}/{}/{}_{}/config'.format(HA_PREFIX, HA_SENSOR, 'wallpad', DEVICE_GAS)
             ha_payload = {
                 'name': '{}_{}_{}'.format(self._name, 'wallpad', DEVICE_GAS),
-                'stat_t': '{}/{}/{}_{}/state'.format(HA_PREFIX, HA_SENSOR, 'wallpad', DEVICE_GAS),
-                'val_tpl': '{{ value_json.' + DEVICE_GAS + ' }}',
+                'state_topic': '{}/{}/{}_{}/state'.format(HA_PREFIX, HA_SENSOR, 'wallpad', DEVICE_GAS),
+                'value_template': '{{ value_json.' + DEVICE_GAS + ' }}',
                 'ic': 'mdi:gas-cylinder',
                 'uniq_id': '{}_{}_{}'.format(self._name, 'wallpad', DEVICE_GAS),
                 'device': {
@@ -613,21 +617,21 @@ class Kocom(rs485):
                 }
             }
             subscribe_list.append((ha_topic, 0))
-            #subscribe_list.append((ha_payload['stat_t'], 0))
+            #subscribe_list.append((ha_payload['state_topic'], 0))
             publish_list.append({ha_topic : json.dumps(ha_payload)})
         if self.wp_fan:
             ha_topic = '{}/{}/{}_{}/config'.format(HA_PREFIX, HA_FAN, 'wallpad', DEVICE_FAN)
             ha_payload = {
                 'name': '{}_{}_{}'.format(self._name, 'wallpad', DEVICE_FAN),
-                'cmd_t': '{}/{}/{}/mode'.format(HA_PREFIX, HA_FAN, 'wallpad'),
-                'stat_t': '{}/{}/{}/state'.format(HA_PREFIX, HA_FAN, 'wallpad'),
-                'spd_cmd_t': '{}/{}/{}/speed'.format(HA_PREFIX, HA_FAN, 'wallpad'),
-                'spd_stat_t': '{}/{}/{}/state'.format(HA_PREFIX, HA_FAN, 'wallpad'),
-                'stat_val_tpl': '{{ value_json.mode }}',
-                'spd_val_tpl': '{{ value_json.speed }}',
+                'command_topic': '{}/{}/{}/mode'.format(HA_PREFIX, HA_FAN, 'wallpad'),
+                'state_topic': '{}/{}/{}/state'.format(HA_PREFIX, HA_FAN, 'wallpad'),
+                'state_value_template': '{{ value_json.mode }}',
                 'pl_on': 'on',
                 'pl_off': 'off',
-                'spds': ['low', 'medium', 'high', 'off'],
+                'percentage_command_topic': '{}/{}/{}/speed'.format(HA_PREFIX, HA_FAN, 'wallpad'),
+                'percentage_state_topic': '{}/{}/{}/state'.format(HA_PREFIX, HA_FAN, 'wallpad'),
+                'percentage_value_template': '{{ value_json.speed }}',
+                'speed_range_max': 3,
                 'uniq_id': '{}_{}_{}'.format(self._name, 'wallpad', DEVICE_FAN),
                 'device': {
                     'name': 'Kocom {}'.format('wallpad'),
@@ -638,9 +642,9 @@ class Kocom(rs485):
                 }
             }
             subscribe_list.append((ha_topic, 0))
-            subscribe_list.append((ha_payload['cmd_t'], 0))
-            #subscribe_list.append((ha_payload['stat_t'], 0))
-            subscribe_list.append((ha_payload['spd_cmd_t'], 0))
+            subscribe_list.append((ha_payload['command_topic'], 0))
+            #subscribe_list.append((ha_payload['state_topic'], 0))
+            subscribe_list.append((ha_payload['percentage_command_topic'], 0))
             if remove:
                 publish_list.append({ha_topic : ''})
             else:
@@ -653,9 +657,9 @@ class Kocom(rs485):
                             ha_topic = '{}/{}/{}_{}/config'.format(HA_PREFIX, HA_LIGHT, room, sub_device)
                             ha_payload = {
                                 'name': '{}_{}_{}'.format(self._name, room, sub_device),
-                                'cmd_t': '{}/{}/{}_{}/set'.format(HA_PREFIX, HA_LIGHT, room, sub_device),
-                                'stat_t': '{}/{}/{}/state'.format(HA_PREFIX, HA_LIGHT, room),
-                                'val_tpl': '{{ value_json.' + str(sub_device) + ' }}',
+                                'command_topic': '{}/{}/{}_{}/set'.format(HA_PREFIX, HA_LIGHT, room, sub_device),
+                                'state_topic': '{}/{}/{}/state'.format(HA_PREFIX, HA_LIGHT, room),
+                                'state_value_template': '{{ value_json.' + str(sub_device) + ' }}',
                                 'pl_on': 'on',
                                 'pl_off': 'off',
                                 'uniq_id': '{}_{}_{}'.format(self._name, room, sub_device),
@@ -668,8 +672,8 @@ class Kocom(rs485):
                                 }
                             }
                             subscribe_list.append((ha_topic, 0))
-                            subscribe_list.append((ha_payload['cmd_t'], 0))
-                            #subscribe_list.append((ha_payload['stat_t'], 0))
+                            subscribe_list.append((ha_payload['command_topic'], 0))
+                            #subscribe_list.append((ha_payload['state_topic'], 0))
                             if remove:
                                 publish_list.append({ha_topic : ''})
                             else:
@@ -682,9 +686,9 @@ class Kocom(rs485):
                             ha_topic = '{}/{}/{}_{}/config'.format(HA_PREFIX, HA_SWITCH, room, sub_device)
                             ha_payload = {
                                 'name': '{}_{}_{}'.format(self._name, room, sub_device),
-                                'cmd_t': '{}/{}/{}_{}/set'.format(HA_PREFIX, HA_SWITCH, room, sub_device),
-                                'stat_t': '{}/{}/{}/state'.format(HA_PREFIX, HA_SWITCH, room),
-                                'val_tpl': '{{ value_json.' + str(sub_device) + ' }}',
+                                'command_topic': '{}/{}/{}_{}/set'.format(HA_PREFIX, HA_SWITCH, room, sub_device),
+                                'state_topic': '{}/{}/{}/state'.format(HA_PREFIX, HA_SWITCH, room),
+                                'value_template': '{{ value_json.' + str(sub_device) + ' }}',
                                 'ic': 'mdi:power-socket-eu',
                                 'pl_on': 'on',
                                 'pl_off': 'off',
@@ -698,8 +702,8 @@ class Kocom(rs485):
                                 }
                             }
                             subscribe_list.append((ha_topic, 0))
-                            subscribe_list.append((ha_payload['cmd_t'], 0))
-                            #subscribe_list.append((ha_payload['stat_t'], 0))
+                            subscribe_list.append((ha_payload['command_topic'], 0))
+                            #subscribe_list.append((ha_payload['state_topic'], 0))
                             if remove:
                                 publish_list.append({ha_topic : ''})
                             else:
@@ -710,14 +714,14 @@ class Kocom(rs485):
                     ha_topic = '{}/{}/{}/config'.format(HA_PREFIX, HA_CLIMATE, room)
                     ha_payload = {
                         'name': '{}_{}_{}'.format(self._name, room, DEVICE_THERMOSTAT),
-                        'mode_cmd_t': '{}/{}/{}/mode'.format(HA_PREFIX, HA_CLIMATE, room),
-                        'mode_stat_t': '{}/{}/{}/state'.format(HA_PREFIX, HA_CLIMATE, room),
-                        'mode_stat_tpl': '{{ value_json.mode }}',
-                        'temp_cmd_t': '{}/{}/{}/target_temp'.format(HA_PREFIX, HA_CLIMATE, room),
-                        'temp_stat_t': '{}/{}/{}/state'.format(HA_PREFIX, HA_CLIMATE, room),
-                        'temp_stat_tpl': '{{ value_json.target_temp }}',
-                        'curr_temp_t': '{}/{}/{}/state'.format(HA_PREFIX, HA_CLIMATE, room),
-                        'curr_temp_tpl': '{{ value_json.current_temp }}',
+                        'mode_command_topic': '{}/{}/{}/mode'.format(HA_PREFIX, HA_CLIMATE, room),
+                        'mode_state_topic': '{}/{}/{}/state'.format(HA_PREFIX, HA_CLIMATE, room),
+                        'mode_state_template': '{{ value_json.mode }}',
+                        'temperature_command_topic': '{}/{}/{}/target_temp'.format(HA_PREFIX, HA_CLIMATE, room),
+                        'temperature_state_topic': '{}/{}/{}/state'.format(HA_PREFIX, HA_CLIMATE, room),
+                        'temperature_state_template': '{{ value_json.target_temp }}',
+                        'current_temperature_topic': '{}/{}/{}/state'.format(HA_PREFIX, HA_CLIMATE, room),
+                        'current_temperature_template': '{{ value_json.current_temp }}',
                         'min_temp': 5,
                         'max_temp': 40,
                         'temp_step': 1,
@@ -732,10 +736,10 @@ class Kocom(rs485):
                         }
                     }
                     subscribe_list.append((ha_topic, 0))
-                    subscribe_list.append((ha_payload['mode_cmd_t'], 0))
-                    #subscribe_list.append((ha_payload['mode_stat_t'], 0))
-                    subscribe_list.append((ha_payload['temp_cmd_t'], 0))
-                    #subscribe_list.append((ha_payload['temp_stat_t'], 0))
+                    subscribe_list.append((ha_payload['mode_command_topic'], 0))
+                    #subscribe_list.append((ha_payload['mode_state_topic'], 0))
+                    subscribe_list.append((ha_payload['temperature_command_topic'], 0))
+                    #subscribe_list.append((ha_payload['temperature_state_topic'], 0))
                     if remove:
                         publish_list.append({ha_topic : ''})
                     else:
@@ -985,7 +989,7 @@ class Kocom(rs485):
         packet = self.make_packet(device, room, '상태', target, value) if cmd == '상태' else  self.make_packet(device, room, '조회', '', '')
         v = self.value_packet(self.parse_packet(packet))
 
-        logger.debug('[To {}]{}'.format(self._name, packet))
+        logger.info('[To {}]{}'.format(self._name, packet))
         if v['command'] == "조회" and v['src_device'] == DEVICE_WALLPAD:
             logger.debug('[To {}]{}({}) {}({}) -> {}({})'.format(self._name, v['type'], v['command'], v['src_device'], v['src_room'], v['dst_device'], v['dst_room']))
         else:
@@ -1186,15 +1190,15 @@ class Grex:
         ha_topic = '{}/{}/{}_{}/config'.format(HA_PREFIX, HA_FAN, 'grex', DEVICE_FAN)
         ha_payload = {
             'name': '{}_{}'.format(self._name, DEVICE_FAN),
-            'cmd_t': '{}/{}/{}/mode'.format(HA_PREFIX, HA_FAN, 'grex'),
-            'stat_t': '{}/{}/{}/state'.format(HA_PREFIX, HA_FAN, 'grex'),
-            'spd_cmd_t': '{}/{}/{}/speed'.format(HA_PREFIX, HA_FAN, 'grex'),
-            'spd_stat_t': '{}/{}/{}/state'.format(HA_PREFIX, HA_FAN, 'grex'),
-            'stat_val_tpl': '{{ value_json.mode }}',
-            'spd_val_tpl': '{{ value_json.speed }}',
+            'command_topic': '{}/{}/{}/mode'.format(HA_PREFIX, HA_FAN, 'grex'),
+            'state_topic': '{}/{}/{}/state'.format(HA_PREFIX, HA_FAN, 'grex'),
+            'value_template': '{{ value_json.mode }}',
             'pl_on': 'on',
             'pl_off': 'off',
-            'spds': ['low', 'medium', 'high', 'off'],
+            'preset_mode_command_topic': '{}/{}/{}/speed'.format(HA_PREFIX, HA_FAN, 'grex'),
+            'preset_mode_state_topic': '{}/{}/{}/state'.format(HA_PREFIX, HA_FAN, 'grex'),
+            'preset_mode_template': '{{ value_json.speed }}',
+            'preset_modes': ['low', 'medium', 'high', 'off'],
             'uniq_id': '{}_{}_{}'.format(self._name, 'grex', DEVICE_FAN),
             'device': {
                 'name': 'Grex Ventilator',
@@ -1205,16 +1209,16 @@ class Grex:
             }
         }
         subscribe_list.append((ha_topic, 0))
-        subscribe_list.append((ha_payload['cmd_t'], 0))
-        subscribe_list.append((ha_payload['spd_cmd_t'], 0))
-        #subscribe_list.append((ha_payload['stat_t'], 0))
+        subscribe_list.append((ha_payload['command_topic'], 0))
+        subscribe_list.append((ha_payload['preset_mode_command_topic'], 0))
+        #subscribe_list.append((ha_payload['state_topic'], 0))
         publish_list.append({ha_topic : json.dumps(ha_payload)})
 
         ha_topic = '{}/{}/{}_{}_mode/config'.format(HA_PREFIX, HA_SENSOR, 'grex', DEVICE_FAN)
         ha_payload = {
             'name': '{}_{}_mode'.format(self._name, DEVICE_FAN),
-            'stat_t': '{}/{}/{}_{}/state'.format(HA_PREFIX, HA_SENSOR, 'grex', DEVICE_FAN),
-            'val_tpl': '{{ value_json.' + DEVICE_FAN + '_mode }}',
+            'state_topic': '{}/{}/{}_{}/state'.format(HA_PREFIX, HA_SENSOR, 'grex', DEVICE_FAN),
+            'state_value_template': '{{ value_json.' + DEVICE_FAN + '_mode }}',
             'ic': 'mdi:play-circle-outline',
             'uniq_id': '{}_{}_{}_mode'.format(self._name, 'grex', DEVICE_FAN),
             'device': {
@@ -1226,13 +1230,13 @@ class Grex:
             }
         }
         subscribe_list.append((ha_topic, 0))
-        #subscribe_list.append((ha_payload['stat_t'], 0))
+        #subscribe_list.append((ha_payload['state_topic'], 0))
         publish_list.append({ha_topic : json.dumps(ha_payload)})
         ha_topic = '{}/{}/{}_{}_speed/config'.format(HA_PREFIX, HA_SENSOR, 'grex', DEVICE_FAN)
         ha_payload = {
             'name': '{}_{}_speed'.format(self._name, DEVICE_FAN),
-            'stat_t': '{}/{}/{}_{}/state'.format(HA_PREFIX, HA_SENSOR, 'grex', DEVICE_FAN),
-            'val_tpl': '{{ value_json.' + DEVICE_FAN + '_speed }}',
+            'state_topic': '{}/{}/{}_{}/state'.format(HA_PREFIX, HA_SENSOR, 'grex', DEVICE_FAN),
+            'state_value_template': '{{ value_json.' + DEVICE_FAN + '_speed }}',
             'ic': 'mdi:speedometer',
             'uniq_id': '{}_{}_{}_speed'.format(self._name, 'grex', DEVICE_FAN),
             'device': {
@@ -1244,7 +1248,7 @@ class Grex:
             }
         }
         subscribe_list.append((ha_topic, 0))
-        #subscribe_list.append((ha_payload['stat_t'], 0))
+        #subscribe_list.append((ha_payload['state_topic'], 0))
         publish_list.append({ha_topic : json.dumps(ha_payload)})
 
         if initial:
@@ -1502,9 +1506,9 @@ if __name__ == '__main__':
     logging.info('{} 시작'.format(SW_VERSION))
     logger.info('{} 시작'.format(SW_VERSION))
 
-    if DEFAULT_SPEED not in ['low', 'medium', 'high']:
+    if DEFAULT_SPEED not in [1, 2, 3]:
         logger.info('[Error] DEFAULT_SPEED 설정오류로 medium 으로 설정. {} -> medium'.format(DEFAULT_SPEED))
-        DEFAULT_SPEED = 'medium'
+        DEFAULT_SPEED = 2
 
     _grex_ventilator = False
     _grex_controller = False
