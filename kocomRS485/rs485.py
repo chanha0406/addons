@@ -948,7 +948,6 @@ class Kocom(rs485):
         return (True, chk_sum) if chk_sum == orgin_sum else (False, chk_sum)
 
     def parse_packet(self, packet):
-        logger.info(f"raw packet : {packet}")
         p = {}
         try:
             p["header"] = packet[:4]
@@ -1018,6 +1017,7 @@ class Kocom(rs485):
     def packet_parsing(self, packet, name="kocom", from_to="From"):
         p = self.parse_packet(packet)
         v = self.value_packet(p)
+        logger.info(f"[{from_to} {name}] raw packet : {packet}")
 
         try:
             if v["command"] == "조회" and v["src_device"] == DEVICE_WALLPAD:
