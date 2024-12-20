@@ -60,22 +60,22 @@ option_file = "/data/options.json"
 if os.path.isfile(option_file):
     with open(option_file) as json_file:
         json_data = json.load(json_file)
-        INIT_TEMP = json_data['Advanced']['INIT_TEMP']
-        SCAN_INTERVAL = json_data['Advanced']['SCAN_INTERVAL']
-        SCANNING_INTERVAL = json_data['Advanced']['SCANNING_INTERVAL']
-        DEFAULT_SPEED = json_data['Advanced']['DEFAULT_SPEED']
-        CONF_LOGLEVEL = json_data['Advanced']['LOGLEVEL']
+        INIT_TEMP = json_data["Advanced"]["INIT_TEMP"]
+        SCAN_INTERVAL = json_data["Advanced"]["SCAN_INTERVAL"]
+        SCANNING_INTERVAL = json_data["Advanced"]["SCANNING_INTERVAL"]
+        DEFAULT_SPEED = json_data["Advanced"]["DEFAULT_SPEED"]
+        CONF_LOGLEVEL = json_data["Advanced"]["LOGLEVEL"]
         KOCOM_LIGHT_SIZE = {}
-        dict_data = json_data['KOCOM_LIGHT_SIZE']
+        dict_data = json_data["KOCOM_LIGHT_SIZE"]
         for i in dict_data:
-            KOCOM_LIGHT_SIZE[i['name']] = i['number']
+            KOCOM_LIGHT_SIZE[i["name"]] = i["number"]
         KOCOM_PLUG_SIZE = {}
-        dict_data = json_data['KOCOM_PLUG_SIZE']
+        dict_data = json_data["KOCOM_PLUG_SIZE"]
         for i in dict_data:
-            KOCOM_PLUG_SIZE[i['name']] = i['number']
+            KOCOM_PLUG_SIZE[i["name"]] = i["number"]
         num = 0
         KOCOM_ROOM = {}
-        list_data = json_data['KOCOM_ROOM']
+        list_data = json_data["KOCOM_ROOM"]
         for i in list_data:
             if num < 10:
                 num_key = "0%d" % (num)
@@ -85,7 +85,7 @@ if os.path.isfile(option_file):
             num += 1
         num = 0
         KOCOM_ROOM_THERMOSTAT = {}
-        list_data = json_data['KOCOM_ROOM_THERMOSTAT']
+        list_data = json_data["KOCOM_ROOM_THERMOSTAT"]
         for i in list_data:
             if num < 10:
                 num_key = "0%d" % (num)
@@ -227,27 +227,27 @@ class rs485:
 
     @property
     def _wp_light(self):
-        return True if self._wp_list['light'] == "True" else False
+        return True if self._wp_list["light"] == "True" else False
 
     @property
     def _wp_fan(self):
-        return True if self._wp_list['fan'] == "True" else False
+        return True if self._wp_list["fan"] == "True" else False
 
     @property
     def _wp_thermostat(self):
-        return True if self._wp_list['thermostat'] == "True" else False
+        return True if self._wp_list["thermostat"] == "True" else False
 
     @property
     def _wp_plug(self):
-        return True if self._wp_list['plug'] == "True" else False
+        return True if self._wp_list["plug"] == "True" else False
 
     @property
     def _wp_gas(self):
-        return True if self._wp_list['gas'] == "True" else False
+        return True if self._wp_list["gas"] == "True" else False
 
     @property
     def _wp_elevator(self):
-        return True if self._wp_list['elevator'] == "True" else False
+        return True if self._wp_list["elevator"] == "True" else False
 
     @property
     def _device(self):
@@ -335,13 +335,13 @@ class Kocom(rs485):
                 self.wp_list[d_name][DEVICE_WALLPAD] = {
                     "scan": {"tick": 0, "count": 0, "last": 0}
                 }
-                self.wp_list[d_name][DEVICE_WALLPAD]['mode'] = {
+                self.wp_list[d_name][DEVICE_WALLPAD]["mode"] = {
                     "state": "off",
                     "set": "off",
                     "last": "state",
                     "count": 0,
                 }
-                self.wp_list[d_name][DEVICE_WALLPAD]['speed'] = {
+                self.wp_list[d_name][DEVICE_WALLPAD]["speed"] = {
                     "state": "off",
                     "set": "off",
                     "last": "state",
@@ -353,19 +353,19 @@ class Kocom(rs485):
                     self.wp_list[d_name][r_name] = {
                         "scan": {"tick": 0, "count": 0, "last": 0}
                     }
-                    self.wp_list[d_name][r_name]['mode'] = {
+                    self.wp_list[d_name][r_name]["mode"] = {
                         "state": "off",
                         "set": "off",
                         "last": "state",
                         "count": 0,
                     }
-                    self.wp_list[d_name][r_name]['current_temp'] = {
+                    self.wp_list[d_name][r_name]["current_temp"] = {
                         "state": 0,
                         "set": 0,
                         "last": "state",
                         "count": 0,
                     }
-                    self.wp_list[d_name][r_name]['target_temp'] = {
+                    self.wp_list[d_name][r_name]["target_temp"] = {
                         "state": INIT_TEMP,
                         "set": INIT_TEMP,
                         "last": "state",
@@ -448,18 +448,18 @@ class Kocom(rs485):
         mqtt_client.on_subscribe = self.on_subscribe
         mqtt_client.on_connect = self.on_connect
 
-        if server['anonymous'] != "True":
+        if server["anonymous"] != "True":
             if (
-                server['server'] == ""
-                or server['username'] == ""
-                or server['password'] == ""
+                server["server"] == ""
+                or server["username"] == ""
+                or server["password"] == ""
             ):
                 logger.info(
                     f"{CONF_MQTT} 설정을 확인하세요. Server[{server['server']}] ID[{server['username']}] PW[{server['password']}] Device[{name}]"
                 )
                 return False
             mqtt_client.username_pw_set(
-                username=server['username'], password=server['password']
+                username=server["username"], password=server["password"]
             )
             logger.debug(
                 f"{CONF_MQTT} STATUS. Server[{server['server']}] ID[{server['username']}] PW[{server['password']}] Device[{name}]"
@@ -469,7 +469,7 @@ class Kocom(rs485):
                 f"{CONF_MQTT} STATUS. Server[{server['server']}] Device[{name}]"
             )
 
-        mqtt_client.connect(server['server'], 1883, 60)
+        mqtt_client.connect(server["server"], 1883, 60)
         mqtt_client.loop_start()
         return mqtt_client
 
@@ -561,18 +561,18 @@ class Kocom(rs485):
                         logger.info("[From HA]Error GAS Cannot Set to ON")
                     else:
                         self.wp_list[device][room][sub_device][command] = payload
-                        self.wp_list[device][room][sub_device]['last'] = command
+                        self.wp_list[device][room][sub_device]["last"] = command
                 elif device == DEVICE_ELEVATOR:
                     if payload == "off":
                         self.wp_list[device][room][sub_device][command] = payload
-                        self.wp_list[device][room][sub_device]['last'] = "state"
+                        self.wp_list[device][room][sub_device]["last"] = "state"
                         self.send_to_homeassistant(device, DEVICE_WALLPAD, payload)
                     else:
                         self.wp_list[device][room][sub_device][command] = payload
-                        self.wp_list[device][room][sub_device]['last'] = command
+                        self.wp_list[device][room][sub_device]["last"] = command
                 else:
                     self.wp_list[device][room][sub_device][command] = payload
-                    self.wp_list[device][room][sub_device]['last'] = command
+                    self.wp_list[device][room][sub_device]["last"] = command
                 logger.info(
                     f"[From HA]{device}/{room}/{sub_device}/{command} = {payload}"
                 )
@@ -583,19 +583,19 @@ class Kocom(rs485):
             room = topic[2]
             try:
                 if command != "mode":
-                    self.wp_list[device][room]['target_temp']['set'] = int(
+                    self.wp_list[device][room]["target_temp"]["set"] = int(
                         float(payload)
                     )
-                    self.wp_list[device][room]['mode']['set'] = "heat"
-                    self.wp_list[device][room]['target_temp']['last'] = "set"
-                    self.wp_list[device][room]['mode']['last'] = "set"
+                    self.wp_list[device][room]["mode"]["set"] = "heat"
+                    self.wp_list[device][room]["target_temp"]["last"] = "set"
+                    self.wp_list[device][room]["mode"]["last"] = "set"
                 elif command == "mode":
-                    self.wp_list[device][room]['mode']['set'] = payload
-                    self.wp_list[device][room]['mode']['last'] = "set"
+                    self.wp_list[device][room]["mode"]["set"] = payload
+                    self.wp_list[device][room]["mode"]["last"] = "set"
                 ha_payload = {
-                    "mode": self.wp_list[device][room]['mode']['set'],
-                    "target_temp": self.wp_list[device][room]['target_temp']['set'],
-                    "current_temp": self.wp_list[device][room]['current_temp']['state'],
+                    "mode": self.wp_list[device][room]["mode"]["set"],
+                    "target_temp": self.wp_list[device][room]["target_temp"]["set"],
+                    "current_temp": self.wp_list[device][room]["current_temp"]["state"],
                 }
                 logger.info(
                     f"[From HA]{device}/{room}/set = [mode={self.wp_list[device][room]['mode']['set'],}, target_temp={self.wp_list[device][room]['target_temp']['set']}]"
@@ -609,21 +609,21 @@ class Kocom(rs485):
             try:
                 if command != "mode":
                     if 0 < int(payload) <= 3:
-                        self.wp_list[device][room]['speed']['set'] = int(payload)
-                        self.wp_list[device][room]['mode']['set'] = "on"
+                        self.wp_list[device][room]["speed"]["set"] = int(payload)
+                        self.wp_list[device][room]["mode"]["set"] = "on"
                     else:
-                        self.wp_list[device][room]['speed']['set'] = int(payload)
-                        self.wp_list[device][room]['mode']['set'] = "off"
+                        self.wp_list[device][room]["speed"]["set"] = int(payload)
+                        self.wp_list[device][room]["mode"]["set"] = "off"
                 elif command == "mode":
-                    self.wp_list[device][room]['speed']['set'] = (
+                    self.wp_list[device][room]["speed"]["set"] = (
                         DEFAULT_SPEED if payload == "on" else 0
                     )
-                    self.wp_list[device][room]['mode']['set'] = payload
-                self.wp_list[device][room]['speed']['last'] = "set"
-                self.wp_list[device][room]['mode']['last'] = "set"
+                    self.wp_list[device][room]["mode"]["set"] = payload
+                self.wp_list[device][room]["speed"]["last"] = "set"
+                self.wp_list[device][room]["mode"]["last"] = "set"
                 ha_payload = {
-                    "mode": self.wp_list[device][room]['mode']['set'],
-                    "speed": self.wp_list[device][room]['speed']['set'],
+                    "mode": self.wp_list[device][room]["mode"]["set"],
+                    "speed": self.wp_list[device][room]["speed"]["set"],
                 }
                 logger.info(
                     f"[From HA]{device}/{room}/set = [mode={ self.wp_list[device][room]['mode']['set']}, speed={self.wp_list[device][room]['speed']['set']}]"
@@ -667,7 +667,7 @@ class Kocom(rs485):
             ha_topic = f"{HA_PREFIX}/{HA_SWITCH}/wallpad_{DEVICE_ELEVATOR}/config"
             ha_payload = {
                 "name": f"{self._name}_wallpad_{DEVICE_ELEVATOR}",
-                "command_topic": f"{HA_PREFIX}/{HA_SWITCH}/{wallpad}_{DEVICE_ELEVATOR}/set"
+                "command_topic": f"{HA_PREFIX}/{HA_SWITCH}/wallpad_{DEVICE_ELEVATOR}/set",
                 "state_topic": f"{HA_PREFIX}/{HA_SWITCH}/wallpad/state",
                 "value_template": f"{{{{ value_json.{DEVICE_ELEVATOR} }}}}",
                 "ic": "mdi:elevator",
@@ -683,7 +683,7 @@ class Kocom(rs485):
                 },
             }
             subscribe_list.append((ha_topic, 0))
-            subscribe_list.append((ha_payload['command_topic'], 0))
+            subscribe_list.append((ha_payload["command_topic"], 0))
             # subscribe_list.append((ha_payload['state_topic'], 0))
             if remove:
                 publish_list.append({ha_topic: ""})
@@ -709,7 +709,7 @@ class Kocom(rs485):
                 },
             }
             subscribe_list.append((ha_topic, 0))
-            subscribe_list.append((ha_payload['command_topic'], 0))
+            subscribe_list.append((ha_payload["command_topic"], 0))
             # subscribe_list.append((ha_payload['state_topic'], 0))
             if remove:
                 publish_list.append({ha_topic: ""})
@@ -757,9 +757,9 @@ class Kocom(rs485):
                 },
             }
             subscribe_list.append((ha_topic, 0))
-            subscribe_list.append((ha_payload['command_topic'], 0))
+            subscribe_list.append((ha_payload["command_topic"], 0))
             # subscribe_list.append((ha_payload['state_topic'], 0))
-            subscribe_list.append((ha_payload['percentage_command_topic'], 0))
+            subscribe_list.append((ha_payload["percentage_command_topic"], 0))
             if remove:
                 publish_list.append({ha_topic: ""})
             else:
@@ -791,7 +791,7 @@ class Kocom(rs485):
                                 },
                             }
                             subscribe_list.append((ha_topic, 0))
-                            subscribe_list.append((ha_payload['command_topic'], 0))
+                            subscribe_list.append((ha_payload["command_topic"], 0))
                             # subscribe_list.append((ha_payload['state_topic'], 0))
                             if remove:
                                 publish_list.append({ha_topic: ""})
@@ -825,7 +825,7 @@ class Kocom(rs485):
                                 },
                             }
                             subscribe_list.append((ha_topic, 0))
-                            subscribe_list.append((ha_payload['command_topic'], 0))
+                            subscribe_list.append((ha_payload["command_topic"], 0))
                             # subscribe_list.append((ha_payload['state_topic'], 0))
                             if remove:
                                 publish_list.append({ha_topic: ""})
@@ -859,9 +859,9 @@ class Kocom(rs485):
                         },
                     }
                     subscribe_list.append((ha_topic, 0))
-                    subscribe_list.append((ha_payload['mode_command_topic'], 0))
+                    subscribe_list.append((ha_payload["mode_command_topic"], 0))
                     # subscribe_list.append((ha_payload['mode_state_topic'], 0))
-                    subscribe_list.append((ha_payload['temperature_command_topic'], 0))
+                    subscribe_list.append((ha_payload["temperature_command_topic"], 0))
                     # subscribe_list.append((ha_payload['temperature_state_topic'], 0))
                     if remove:
                         publish_list.append({ha_topic: ""})
@@ -951,23 +951,23 @@ class Kocom(rs485):
         logger.info(f"raw packet : {packet}")
         p = {}
         try:
-            p['header'] = packet[:4]
-            p['type'] = packet[4:7]
-            p['order'] = packet[7:8]
-            if KOCOM_TYPE.get(p['type']) == "send":
-                p['dst_device'] = packet[10:12]
-                p['dst_room'] = packet[12:14]
-                p['src_device'] = packet[14:16]
-                p['src_room'] = packet[16:18]
-            elif KOCOM_TYPE.get(p['type']) == "ack":
-                p['src_device'] = packet[10:12]
-                p['src_room'] = packet[12:14]
-                p['dst_device'] = packet[14:16]
-                p['dst_room'] = packet[16:18]
-            p['command'] = packet[18:20]
-            p['value'] = packet[20:36]
-            p['checksum'] = packet[36:38]
-            p['tail'] = packet[38:42]
+            p["header"] = packet[:4]
+            p["type"] = packet[4:7]
+            p["order"] = packet[7:8]
+            if KOCOM_TYPE.get(p["type"]) == "send":
+                p["dst_device"] = packet[10:12]
+                p["dst_room"] = packet[12:14]
+                p["src_device"] = packet[14:16]
+                p["src_room"] = packet[16:18]
+            elif KOCOM_TYPE.get(p["type"]) == "ack":
+                p["src_device"] = packet[10:12]
+                p["src_room"] = packet[12:14]
+                p["dst_device"] = packet[14:16]
+                p["dst_room"] = packet[16:18]
+            p["command"] = packet[18:20]
+            p["value"] = packet[20:36]
+            p["checksum"] = packet[36:38]
+            p["tail"] = packet[38:42]
             return p
         except:
             return False
@@ -977,40 +977,40 @@ class Kocom(rs485):
         if not p:
             return False
         try:
-            v['type'] = KOCOM_TYPE.get(p['type'])
-            v['command'] = KOCOM_COMMAND.get(p['command'])
-            v['src_device'] = KOCOM_DEVICE.get(p['src_device'])
-            v['src_room'] = (
-                KOCOM_ROOM.get(p['src_room'])
-                if v['src_device'] != DEVICE_THERMOSTAT
-                else KOCOM_ROOM_THERMOSTAT.get(p['src_room'])
+            v["type"] = KOCOM_TYPE.get(p["type"])
+            v["command"] = KOCOM_COMMAND.get(p["command"])
+            v["src_device"] = KOCOM_DEVICE.get(p["src_device"])
+            v["src_room"] = (
+                KOCOM_ROOM.get(p["src_room"])
+                if v["src_device"] != DEVICE_THERMOSTAT
+                else KOCOM_ROOM_THERMOSTAT.get(p["src_room"])
             )
-            v['dst_device'] = KOCOM_DEVICE.get(p['dst_device'])
-            v['dst_room'] = (
-                KOCOM_ROOM.get(p['dst_room'])
-                if v['src_device'] != DEVICE_THERMOSTAT
-                else KOCOM_ROOM_THERMOSTAT.get(p['dst_room'])
+            v["dst_device"] = KOCOM_DEVICE.get(p["dst_device"])
+            v["dst_room"] = (
+                KOCOM_ROOM.get(p["dst_room"])
+                if v["src_device"] != DEVICE_THERMOSTAT
+                else KOCOM_ROOM_THERMOSTAT.get(p["dst_room"])
             )
-            v['value'] = p['value']
-            if v['src_device'] == DEVICE_FAN:
-                v['value'] = self.parse_fan(p['value'])
-            elif v['src_device'] == DEVICE_LIGHT or v['src_device'] == DEVICE_PLUG:
-                v['value'] = self.parse_switch(
-                    v['src_device'], v['src_room'], p['value']
+            v["value"] = p["value"]
+            if v["src_device"] == DEVICE_FAN:
+                v["value"] = self.parse_fan(p["value"])
+            elif v["src_device"] == DEVICE_LIGHT or v["src_device"] == DEVICE_PLUG:
+                v["value"] = self.parse_switch(
+                    v["src_device"], v["src_room"], p["value"]
                 )
-            elif v['src_device'] == DEVICE_THERMOSTAT:
-                v['value'] = self.parse_thermostat(
-                    p['value'],
-                    self.wp_list[v['src_device']][v['src_room']]['target_temp'][
+            elif v["src_device"] == DEVICE_THERMOSTAT:
+                v["value"] = self.parse_thermostat(
+                    p["value"],
+                    self.wp_list[v["src_device"]][v["src_room"]]["target_temp"][
                         "state"
                     ],
                 )
             elif (
-                v['src_device'] == DEVICE_WALLPAD and v['dst_device'] == DEVICE_ELEVATOR
+                v["src_device"] == DEVICE_WALLPAD and v["dst_device"] == DEVICE_ELEVATOR
             ):
-                v['value'] = "off"
-            elif v['src_device'] == DEVICE_GAS:
-                v['value'] = v['command']
+                v["value"] = "off"
+            elif v["src_device"] == DEVICE_GAS:
+                v["value"] = v["command"]
             return v
         except:
             return False
@@ -1020,10 +1020,10 @@ class Kocom(rs485):
         v = self.value_packet(p)
 
         try:
-            if v['command'] == "조회" and v['src_device'] == DEVICE_WALLPAD:
+            if v["command"] == "조회" and v["src_device"] == DEVICE_WALLPAD:
                 if name == "HA":
                     self.write(
-                        self.make_packet(v['dst_device'], v['dst_room'], "조회", "", "")
+                        self.make_packet(v["dst_device"], v["dst_room"], "조회", "", "")
                     )
                 logger.debug(
                     f"[{from_to} {name}]{v['type']}({v['command']}) {v['src_device']}({v['src_room']}) -> {v['dst_device']}({v['dst_room']})"
@@ -1033,27 +1033,27 @@ class Kocom(rs485):
                     f"[{from_to} {name}]{v['type']}({v['command']}) {v['src_device']}({v['src_room']}) -> {v['dst_device']}({v['dst_room']}) = {v['value']}"
                 )
 
-            if (v['type'] == "ack" and v['dst_device'] == DEVICE_WALLPAD) or (
-                v['type'] == "send" and v['dst_device'] == DEVICE_ELEVATOR
+            if (v["type"] == "ack" and v["dst_device"] == DEVICE_WALLPAD) or (
+                v["type"] == "send" and v["dst_device"] == DEVICE_ELEVATOR
             ):
-                if v['type'] == "send" and v['dst_device'] == DEVICE_ELEVATOR:
-                    self.set_list(v['dst_device'], DEVICE_WALLPAD, v['value'])
+                if v["type"] == "send" and v["dst_device"] == DEVICE_ELEVATOR:
+                    self.set_list(v["dst_device"], DEVICE_WALLPAD, v["value"])
                     self.send_to_homeassistant(
-                        v['dst_device'], DEVICE_WALLPAD, v['value']
+                        v["dst_device"], DEVICE_WALLPAD, v["value"]
                     )
-                elif v['src_device'] == DEVICE_FAN or v['src_device'] == DEVICE_GAS:
-                    self.set_list(v['src_device'], DEVICE_WALLPAD, v['value'])
+                elif v["src_device"] == DEVICE_FAN or v["src_device"] == DEVICE_GAS:
+                    self.set_list(v["src_device"], DEVICE_WALLPAD, v["value"])
                     self.send_to_homeassistant(
-                        v['src_device'], DEVICE_WALLPAD, v['value']
+                        v["src_device"], DEVICE_WALLPAD, v["value"]
                     )
                 elif (
-                    v['src_device'] == DEVICE_THERMOSTAT
-                    or v['src_device'] == DEVICE_LIGHT
-                    or v['src_device'] == DEVICE_PLUG
+                    v["src_device"] == DEVICE_THERMOSTAT
+                    or v["src_device"] == DEVICE_LIGHT
+                    or v["src_device"] == DEVICE_PLUG
                 ):
-                    self.set_list(v['src_device'], v['src_room'], v['value'])
+                    self.set_list(v["src_device"], v["src_room"], v["value"])
                     self.send_to_homeassistant(
-                        v['src_device'], v['src_room'], v['value']
+                        v["src_device"], v["src_room"], v["value"]
                     )
         except:
             logger.info(f"[{from_to} {name}]Error {packet}")
@@ -1063,64 +1063,32 @@ class Kocom(rs485):
             logger.info(f"[From {name}]{device}/{room}/state = {value}")
             if (
                 "scan" in self.wp_list[device][room]
-                and type(self.wp_list[device][room]['scan']) == dict
+                and type(self.wp_list[device][room]["scan"]) == dict
             ):
-                self.wp_list[device][room]['scan']['tick'] = time.time()
-                self.wp_list[device][room]['scan']['count'] = 0
-                self.wp_list[device][room]['scan']['last'] = 0
+                self.wp_list[device][room]["scan"]["tick"] = time.time()
+                self.wp_list[device][room]["scan"]["count"] = 0
+                self.wp_list[device][room]["scan"]["last"] = 0
             if device == DEVICE_GAS or device == DEVICE_ELEVATOR:
-                self.wp_list[device][room][device]['state'] = value
-                self.wp_list[device][room][device]['last'] = "state"
-                self.wp_list[device][room][device]['count'] = 0
+                self.wp_list[device][room][device]["state"] = value
+                self.wp_list[device][room][device]["last"] = "state"
+                self.wp_list[device][room][device]["count"] = 0
             elif device == DEVICE_FAN:
                 for sub, v in value.items():
                     try:
                         if sub == "mode":
-                            self.wp_list[device][room][sub]['state'] = v
-                            self.wp_list[device][room]['speed']['state'] = (
+                            self.wp_list[device][room][sub]["state"] = v
+                            self.wp_list[device][room]["speed"]["state"] = (
                                 "off" if v == "off" else DEFAULT_SPEED
                             )
                         else:
-                            self.wp_list[device][room][sub]['state'] = v
-                            self.wp_list[device][room]['mode']['state'] = (
+                            self.wp_list[device][room][sub]["state"] = v
+                            self.wp_list[device][room]["mode"]["state"] = (
                                 "off" if v == "off" else "on"
                             )
                         if (
-                            self.wp_list[device][room][sub]['last'] == "set"
-                            or type(self.wp_list[device][room][sub]['last']) == float
-                        ) and self.wp_list[device][room][sub]['set'] == self.wp_list[device][room][sub]["state"]:
-                            self.wp_list[device][room][sub]['last'] = "state"
-                            self.wp_list[device][room][sub]['count'] = 0
-                    except:
-                        logger.info(
-                            f"[From {name}]Error SetListDevice {device}/{room}/{sub}/state = {v}"
-                        )
-            elif device == DEVICE_LIGHT or device == DEVICE_PLUG:
-                for sub, v in value.items():
-                    try:
-                        self.wp_list[device][room][sub]['state'] = v
-                        if (
-                            self.wp_list[device][room][sub]['last'] == "set"
-                            or type(self.wp_list[device][room][sub]['last']) == float
-                        ) and self.wp_list[device][room][sub]['set'] == self.wp_list[device][room][sub]["state"]:
-                            self.wp_list[device][room][sub]['last'] = "state"
-                            self.wp_list[device][room][sub]['count'] = 0
-                    except:
-                        logger.info(
-                            f"[From {name}]Error SetListDevice {device}/{room}/{sub}/state = {v}"
-                        )
-            elif device == DEVICE_THERMOSTAT:
-                for sub, v in value.items():
-                    try:
-                        if sub == "mode":
-                            self.wp_list[device][room][sub]['state'] = v
-                        else:
-                            self.wp_list[device][room][sub]['state'] = int(float(v))
-                            self.wp_list[device][room]['mode']['state'] = "heat"
-                        if (
-                            self.wp_list[device][room][sub]['last'] == "set"
-                            or type(self.wp_list[device][room][sub]['last']) == float
-                        ) and self.wp_list[device][room][sub]['set'] == self.wp_list[
+                            self.wp_list[device][room][sub]["last"] == "set"
+                            or type(self.wp_list[device][room][sub]["last"]) == float
+                        ) and self.wp_list[device][room][sub]["set"] == self.wp_list[
                             device
                         ][
                             room
@@ -1129,8 +1097,56 @@ class Kocom(rs485):
                         ][
                             "state"
                         ]:
-                            self.wp_list[device][room][sub]['last'] = "state"
-                            self.wp_list[device][room][sub]['count'] = 0
+                            self.wp_list[device][room][sub]["last"] = "state"
+                            self.wp_list[device][room][sub]["count"] = 0
+                    except:
+                        logger.info(
+                            f"[From {name}]Error SetListDevice {device}/{room}/{sub}/state = {v}"
+                        )
+            elif device == DEVICE_LIGHT or device == DEVICE_PLUG:
+                for sub, v in value.items():
+                    try:
+                        self.wp_list[device][room][sub]["state"] = v
+                        if (
+                            self.wp_list[device][room][sub]["last"] == "set"
+                            or type(self.wp_list[device][room][sub]["last"]) == float
+                        ) and self.wp_list[device][room][sub]["set"] == self.wp_list[
+                            device
+                        ][
+                            room
+                        ][
+                            sub
+                        ][
+                            "state"
+                        ]:
+                            self.wp_list[device][room][sub]["last"] = "state"
+                            self.wp_list[device][room][sub]["count"] = 0
+                    except:
+                        logger.info(
+                            f"[From {name}]Error SetListDevice {device}/{room}/{sub}/state = {v}"
+                        )
+            elif device == DEVICE_THERMOSTAT:
+                for sub, v in value.items():
+                    try:
+                        if sub == "mode":
+                            self.wp_list[device][room][sub]["state"] = v
+                        else:
+                            self.wp_list[device][room][sub]["state"] = int(float(v))
+                            self.wp_list[device][room]["mode"]["state"] = "heat"
+                        if (
+                            self.wp_list[device][room][sub]["last"] == "set"
+                            or type(self.wp_list[device][room][sub]["last"]) == float
+                        ) and self.wp_list[device][room][sub]["set"] == self.wp_list[
+                            device
+                        ][
+                            room
+                        ][
+                            sub
+                        ][
+                            "state"
+                        ]:
+                            self.wp_list[device][room][sub]["last"] = "state"
+                            self.wp_list[device][room][sub]["count"] = 0
                     except:
                         logger.info(
                             f"[From {name}]Error SetListDevice {device}/{room}/{sub}/state = {v}"
@@ -1157,8 +1173,8 @@ class Kocom(rs485):
                                     if type(r_list) == dict:
                                         if (
                                             "scan" in r_list
-                                            and type(r_list['scan']) == dict
-                                            and now - r_list['scan']['tick']
+                                            and type(r_list["scan"]) == dict
+                                            and now - r_list["scan"]["tick"]
                                             > SCAN_INTERVAL
                                             and (
                                                 (device == DEVICE_FAN and self.wp_fan)
@@ -1179,41 +1195,41 @@ class Kocom(rs485):
                                                 )
                                             )
                                         ):
-                                            if now - r_list['scan']['last'] > 2:
-                                                r_list['scan']['count'] += 1
-                                                r_list['scan']['last'] = now
+                                            if now - r_list["scan"]["last"] > 2:
+                                                r_list["scan"]["count"] += 1
+                                                r_list["scan"]["last"] = now
                                                 self.set_serial(
                                                     device, room, "", "", cmd="조회"
                                                 )
                                                 time.sleep(SCANNING_INTERVAL)
-                                            if r_list['scan']['count'] > 4:
-                                                r_list['scan']['tick'] = now
-                                                r_list['scan']['count'] = 0
-                                                r_list['scan']['last'] = 0
+                                            if r_list["scan"]["count"] > 4:
+                                                r_list["scan"]["tick"] = now
+                                                r_list["scan"]["count"] = 0
+                                                r_list["scan"]["last"] = 0
                                         else:
                                             for sub_d, sub_v in r_list.items():
                                                 if sub_d != "scan":
-                                                    if sub_v['count'] > 4:
-                                                        sub_v['count'] = 0
-                                                        sub_v['last'] = "state"
-                                                    elif sub_v['last'] == "set":
-                                                        sub_v['last'] = now
+                                                    if sub_v["count"] > 4:
+                                                        sub_v["count"] = 0
+                                                        sub_v["last"] = "state"
+                                                    elif sub_v["last"] == "set":
+                                                        sub_v["last"] = now
                                                         if device == DEVICE_GAS:
-                                                            sub_v['last'] += 5
+                                                            sub_v["last"] += 5
                                                         elif device == DEVICE_ELEVATOR:
-                                                            sub_v['last'] = "state"
+                                                            sub_v["last"] = "state"
                                                         self.set_serial(
                                                             device,
                                                             room,
                                                             sub_d,
-                                                            sub_v['set'],
+                                                            sub_v["set"],
                                                         )
                                                     elif (
-                                                        type(sub_v['last']) == float
-                                                        and now - sub_v['last'] > 1
+                                                        type(sub_v["last"]) == float
+                                                        and now - sub_v["last"] > 1
                                                     ):
-                                                        sub_v['last'] = "set"
-                                                        sub_v['count'] += 1
+                                                        sub_v["last"] = "set"
+                                                        sub_v["count"] += 1
                     except:
                         logger.debug("[Scan]Error")
             if not self.connected:
@@ -1238,7 +1254,7 @@ class Kocom(rs485):
         v = self.value_packet(self.parse_packet(packet))
 
         logger.info(f"[To {self._name}]{packet}")
-        if v['command'] == "조회" and v['src_device'] == DEVICE_WALLPAD:
+        if v["command"] == "조회" and v["src_device"] == DEVICE_WALLPAD:
             logger.debug(
                 f"[To {self._name}]{v['type']}({v['command']}) {v['src_device']}({v['src_room']}) -> {v['dst_device']}({v['dst_room']})"
             )
@@ -1291,7 +1307,7 @@ class Kocom(rs485):
                             else:
                                 if (
                                     sub_device in self.wp_list[device][room]
-                                    and self.wp_list[device][room][sub_device]['state']
+                                    and self.wp_list[device][room][sub_device]["state"]
                                     == "on"
                                 ):
                                     p_value += "ff"
@@ -1303,8 +1319,8 @@ class Kocom(rs485):
                     logger.debug("[Make Packet] Error on DEVICE_LIGHT or DEVICE_PLUG")
             elif device == DEVICE_THERMOSTAT:
                 try:
-                    mode = self.wp_list[device][room]['mode']['set']
-                    target_temp = self.wp_list[device][room]['target_temp']['set']
+                    mode = self.wp_list[device][room]["mode"]["set"]
+                    target_temp = self.wp_list[device][room]["target_temp"]["set"]
                     if mode == "heat":
                         p_value += "1100"
                     elif mode == "off":
@@ -1318,8 +1334,8 @@ class Kocom(rs485):
                     logger.debug("[Make Packet] Error on DEVICE_THERMOSTAT")
             elif device == DEVICE_FAN:
                 try:
-                    mode = self.wp_list[device][room]['mode']['set']
-                    speed = self.wp_list[device][room]['speed']['set']
+                    mode = self.wp_list[device][room]["mode"]["set"]
+                    speed = self.wp_list[device][room]["speed"]["set"]
                     if mode == "on":
                         p_value += "1100"
                     elif mode == "off":
@@ -1337,8 +1353,8 @@ class Kocom(rs485):
 
     def parse_fan(self, value="0000000000000000"):
         fan = {}
-        fan['mode'] = "on" if value[:2] == "11" else "off"
-        fan['speed'] = KOCOM_FAN_SPEED.get(value[4:5])
+        fan["mode"] = "on" if value[:2] == "11" else "off"
+        fan["speed"] = KOCOM_FAN_SPEED.get(value[4:5])
         return fan
 
     def parse_switch(self, device, room, value="0000000000000000"):
@@ -1362,16 +1378,16 @@ class Kocom(rs485):
         thermo = {}
         heat_mode = "heat" if value[:2] == "11" else "off"
         away_mode = "on" if value[2:4] == "01" else "off"
-        thermo['current_temp'] = int(value[8:10], 16)
+        thermo["current_temp"] = int(value[8:10], 16)
         if heat_mode == "heat" and away_mode == "on":
-            thermo['mode'] = "fan_only"
-            thermo['target_temp'] = INIT_TEMP if not init_temp else int(init_temp)
+            thermo["mode"] = "fan_only"
+            thermo["target_temp"] = INIT_TEMP if not init_temp else int(init_temp)
         elif heat_mode == "heat" and away_mode == "off":
-            thermo['mode'] = "heat"
-            thermo['target_temp'] = int(value[4:6], 16)
+            thermo["mode"] = "heat"
+            thermo["target_temp"] = int(value[4:6], 16)
         elif heat_mode == "off":
-            thermo['mode'] = "off"
-            thermo['target_temp'] = INIT_TEMP if not init_temp else int(init_temp)
+            thermo["mode"] = "off"
+            thermo["target_temp"] = INIT_TEMP if not init_temp else int(init_temp)
         return thermo
 
 
@@ -1389,9 +1405,9 @@ class Grex:
         _t4 = threading.Thread(
             target=self.get_serial,
             args=(
-                self.contoller['serial'],
-                self.contoller['name'],
-                self.contoller['length'],
+                self.contoller["serial"],
+                self.contoller["name"],
+                self.contoller["length"],
             ),
         )
         _t4.daemon = True
@@ -1399,9 +1415,9 @@ class Grex:
         _t5 = threading.Thread(
             target=self.get_serial,
             args=(
-                self.ventilator['serial'],
-                self.ventilator['name'],
-                self.ventilator['length'],
+                self.ventilator["serial"],
+                self.ventilator["name"],
+                self.ventilator["length"],
             ),
         )
         _t5.daemon = True
@@ -1414,18 +1430,18 @@ class Grex:
         mqtt_client.on_subscribe = self.on_subscribe
         mqtt_client.on_connect = self.on_connect
 
-        if server['anonymous'] != "True":
+        if server["anonymous"] != "True":
             if (
-                server['server'] == ""
-                or server['username'] == ""
-                or server['password'] == ""
+                server["server"] == ""
+                or server["username"] == ""
+                or server["password"] == ""
             ):
                 logger.info(
                     f"{CONF_MQTT} 설정을 확인하세요. Server[{server['server']}] ID[{server['username']}] PW[{server['password']}] Device[{name}]"
                 )
                 return False
             mqtt_client.username_pw_set(
-                username=server['username'], password=server['password']
+                username=server["username"], password=server["password"]
             )
             logger.debug(
                 f"{CONF_MQTT} STATUS. Server[{server['server']}] ID[{server['username']}] PW[{server['password']}] Device[{name}]"
@@ -1435,7 +1451,7 @@ class Grex:
                 f"{CONF_MQTT} STATUS. Server[{server['server']}] Device[{name}]"
             )
 
-        mqtt_client.connect(server['server'], 1883, 60)
+        mqtt_client.connect(server["server"], 1883, 60)
         mqtt_client.loop_start()
         return mqtt_client
 
@@ -1454,12 +1470,12 @@ class Grex:
                     _topic[3] == "mode"
                     and self.mqtt_cont[_topic[3]] == "off"
                     and _payload == "on"
-                    and self.mqtt_cont['speed'] == "off"
+                    and self.mqtt_cont["speed"] == "off"
                 ):
-                    self.mqtt_cont['speed'] = "low"
+                    self.mqtt_cont["speed"] = "low"
                 self.mqtt_cont[_topic[3]] = _payload
 
-                if self.mqtt_cont['mode'] == "off" and self.mqtt_cont['speed'] == "off":
+                if self.mqtt_cont["mode"] == "off" and self.mqtt_cont["speed"] == "off":
                     self.send_to_homeassistant(HA_FAN, self.mqtt_cont)
 
     def on_publish(self, client, obj, mid):
@@ -1511,8 +1527,8 @@ class Grex:
             },
         }
         subscribe_list.append((ha_topic, 0))
-        subscribe_list.append((ha_payload['command_topic'], 0))
-        subscribe_list.append((ha_payload['preset_mode_command_topic'], 0))
+        subscribe_list.append((ha_payload["command_topic"], 0))
+        subscribe_list.append((ha_payload["preset_mode_command_topic"], 0))
         # subscribe_list.append((ha_payload['state_topic'], 0))
         publish_list.append({ha_topic: json.dumps(ha_payload)})
 
@@ -1570,8 +1586,7 @@ class Grex:
             )
             logger.info(
                 f"[To HA]{HA_PREFIX}/{HA_SENSOR}/grex_{DEVICE_FAN}/state = {json.dumps(value, ensure_ascii=False)}"
-                )
-            
+            )
 
     def get_serial(self, ser, packet_name, packet_len):
         buf = []
@@ -1608,7 +1623,7 @@ class Grex:
             m_packet = self.make_response_packet(0)
             m_chksum = self.validate_checksum(m_packet, 11)
             if m_chksum[0]:
-                self.contoller['serial'].write(bytearray.fromhex(m_packet))
+                self.contoller["serial"].write(bytearray.fromhex(m_packet))
             logger.debug("[From Grex]error code : E1")
         elif p_prefix == "d08a":
             control_packet = ""
@@ -1617,116 +1632,116 @@ class Grex:
             p_speed = packet[12:16]
 
             if (
-                self.grex_cont['mode'] != GREX_MODE[p_mode]
-                or self.grex_cont['speed'] != GREX_SPEED[p_speed]
+                self.grex_cont["mode"] != GREX_MODE[p_mode]
+                or self.grex_cont["speed"] != GREX_SPEED[p_speed]
             ):
-                self.grex_cont['mode'] = GREX_MODE[p_mode]
-                self.grex_cont['speed'] = GREX_SPEED[p_speed]
+                self.grex_cont["mode"] = GREX_MODE[p_mode]
+                self.grex_cont["speed"] = GREX_SPEED[p_speed]
                 logger.info(
                     f"[From {packet_name}]mode:{self.grex_cont['mode']} / speed:{self.grex_cont['speed']}"
                 )
                 send_to_ha_fan = {"mode": "off", "speed": "off"}
-                if self.grex_cont['mode'] != "off" or (
-                    self.grex_cont['mode'] == "off" and self.mqtt_cont['mode'] == "on"
+                if self.grex_cont["mode"] != "off" or (
+                    self.grex_cont["mode"] == "off" and self.mqtt_cont["mode"] == "on"
                 ):
-                    send_to_ha_fan['mode'] = "on"
-                    send_to_ha_fan['speed'] = self.grex_cont['speed']
+                    send_to_ha_fan["mode"] = "on"
+                    send_to_ha_fan["speed"] = self.grex_cont["speed"]
                 self.send_to_homeassistant(HA_FAN, send_to_ha_fan)
 
                 send_to_ha_sensor = {"fan_mode": "off", "fan_speed": "off"}
-                if self.grex_cont['mode'] != "off" or (
-                    self.grex_cont['mode'] == "off" and self.mqtt_cont['mode'] == "on"
+                if self.grex_cont["mode"] != "off" or (
+                    self.grex_cont["mode"] == "off" and self.mqtt_cont["mode"] == "on"
                 ):
-                    if self.grex_cont['mode'] == "auto":
-                        send_to_ha_sensor['fan_mode'] = "자동"
-                    elif self.grex_cont['mode'] == "manual":
-                        send_to_ha_sensor['fan_mode'] = "수동"
-                    elif self.grex_cont['mode'] == "sleep":
-                        send_to_ha_sensor['fan_mode'] = "취침"
+                    if self.grex_cont["mode"] == "auto":
+                        send_to_ha_sensor["fan_mode"] = "자동"
+                    elif self.grex_cont["mode"] == "manual":
+                        send_to_ha_sensor["fan_mode"] = "수동"
+                    elif self.grex_cont["mode"] == "sleep":
+                        send_to_ha_sensor["fan_mode"] = "취침"
                     elif (
-                        self.grex_cont['mode'] == "off"
-                        and self.mqtt_cont['mode'] == "on"
+                        self.grex_cont["mode"] == "off"
+                        and self.mqtt_cont["mode"] == "on"
                     ):
-                        send_to_ha_sensor['fan_mode'] = "HA"
-                    if self.grex_cont['speed'] == "low":
-                        send_to_ha_sensor['fan_speed'] = "1단"
-                    elif self.grex_cont['speed'] == "medium":
-                        send_to_ha_sensor['fan_speed'] = "2단"
-                    elif self.grex_cont['speed'] == "high":
-                        send_to_ha_sensor['fan_speed'] = "3단"
-                    elif self.grex_cont['speed'] == "off":
-                        send_to_ha_sensor['fan_speed'] = "대기"
+                        send_to_ha_sensor["fan_mode"] = "HA"
+                    if self.grex_cont["speed"] == "low":
+                        send_to_ha_sensor["fan_speed"] = "1단"
+                    elif self.grex_cont["speed"] == "medium":
+                        send_to_ha_sensor["fan_speed"] = "2단"
+                    elif self.grex_cont["speed"] == "high":
+                        send_to_ha_sensor["fan_speed"] = "3단"
+                    elif self.grex_cont["speed"] == "off":
+                        send_to_ha_sensor["fan_speed"] = "대기"
                 self.send_to_homeassistant(HA_SENSOR, send_to_ha_sensor)
 
-            if self.grex_cont['mode'] == "off":
+            if self.grex_cont["mode"] == "off":
                 response_packet = self.make_response_packet(0)
-                if self.mqtt_cont['mode'] == "off" or (
-                    self.mqtt_cont['mode'] == "on" and self.mqtt_cont['speed'] == "off"
+                if self.mqtt_cont["mode"] == "off" or (
+                    self.mqtt_cont["mode"] == "on" and self.mqtt_cont["speed"] == "off"
                 ):
                     control_packet = self.make_control_packet("off", "off")
                 elif (
-                    self.mqtt_cont['mode'] == "on" and self.mqtt_cont['speed'] != "off"
+                    self.mqtt_cont["mode"] == "on" and self.mqtt_cont["speed"] != "off"
                 ):
                     control_packet = self.make_control_packet(
-                        "manual", self.mqtt_cont['speed']
+                        "manual", self.mqtt_cont["speed"]
                     )
             else:
                 control_packet = self.make_control_packet(
-                    self.grex_cont['mode'], self.grex_cont['speed']
+                    self.grex_cont["mode"], self.grex_cont["speed"]
                 )
-                if self.grex_cont['speed'] == "low":
+                if self.grex_cont["speed"] == "low":
                     response_packet = self.make_response_packet(1)
-                elif self.grex_cont['speed'] == "medium":
+                elif self.grex_cont["speed"] == "medium":
                     response_packet = self.make_response_packet(2)
-                elif self.grex_cont['speed'] == "high":
+                elif self.grex_cont["speed"] == "high":
                     response_packet = self.make_response_packet(3)
-                elif self.grex_cont['speed'] == "off":
+                elif self.grex_cont["speed"] == "off":
                     response_packet = self.make_response_packet(0)
 
             if response_packet != "":
-                self.contoller['serial'].write(bytearray.fromhex(response_packet))
+                self.contoller["serial"].write(bytearray.fromhex(response_packet))
                 # logger.debug(f"[Tooo grex_controller]{response_packet}")
             if control_packet != "":
-                self.ventilator['serial'].write(bytearray.fromhex(control_packet))
+                self.ventilator["serial"].write(bytearray.fromhex(control_packet))
                 # logger.debug(f"[Tooo grex_ventilator]{control_packet}")
 
         elif p_prefix == "d18b":
             p_speed = packet[8:12]
-            if self.vent_cont['speed'] != GREX_SPEED[p_speed]:
-                self.vent_cont['speed'] = GREX_SPEED[p_speed]
+            if self.vent_cont["speed"] != GREX_SPEED[p_speed]:
+                self.vent_cont["speed"] = GREX_SPEED[p_speed]
                 logger.info(f"[From {packet_name}]speed:{self.vent_cont['speed']}")
 
                 send_to_ha_fan = {"mode": "off", "speed": "off"}
-                if self.grex_cont['mode'] != "off" or (
-                    self.grex_cont['mode'] == "off" and self.mqtt_cont['mode'] == "on"
+                if self.grex_cont["mode"] != "off" or (
+                    self.grex_cont["mode"] == "off" and self.mqtt_cont["mode"] == "on"
                 ):
-                    send_to_ha_fan['mode'] = "on"
-                    send_to_ha_fan['speed'] = self.vent_cont['speed']
+                    send_to_ha_fan["mode"] = "on"
+                    send_to_ha_fan["speed"] = self.vent_cont["speed"]
                 self.send_to_homeassistant(HA_FAN, send_to_ha_fan)
 
                 send_to_ha_sensor = {"fan_mode": "off", "fan_speed": "off"}
-                if self.grex_cont['mode'] != "off" or (
-                    self.grex_cont['mode'] == "off" and self.mqtt_cont['mode'] == "on"
+                if self.grex_cont["mode"] != "off" or (
+                    self.grex_cont["mode"] == "off" and self.mqtt_cont["mode"] == "on"
                 ):
-                    if self.grex_cont['mode'] == "auto":
-                        send_to_ha_sensor['fan_mode'] = "자동"
-                    elif self.grex_cont['mode'] == "manual":
-                        send_to_ha_sensor['fan_mode'] = "수동"
-                    elif self.grex_cont['mode'] == "sleep":
-                        send_to_ha_sensor['fan_mode'] = "취침"
+                    if self.grex_cont["mode"] == "auto":
+                        send_to_ha_sensor["fan_mode"] = "자동"
+                    elif self.grex_cont["mode"] == "manual":
+                        send_to_ha_sensor["fan_mode"] = "수동"
+                    elif self.grex_cont["mode"] == "sleep":
+                        send_to_ha_sensor["fan_mode"] = "취침"
                     elif (
-                        self.grex_cont['mode'] == "off"
-                        and self.mqtt_cont['mode'] == "on"
+                        self.grex_cont["mode"] == "off"
+                        and self.mqtt_cont["mode"] == "on"
                     ):
-                        send_to_ha_sensor['fan_mode'] = "HA"
-                    if self.vent_cont['speed'] == "low":
-                        send_to_ha_sensor['fan_speed'] = "1단"
-                    elif self.vent_cont['speed'] == "medium":
-                        send_to_ha_sensor['fan_speed'] = "2단"
-                    elif self.vent_cont['speed'] == "high":
-                        send_to_ha_sensor['fan_speed'] = "3단"
-                    elif self.vent_cont['speed'] == "off":
-                        send_to_ha_sensor['fan_speed'] = "대기"
+                        send_to_ha_sensor["fan_mode"] = "HA"
+                    if self.vent_cont["speed"] == "low":
+                        send_to_ha_sensor["fan_speed"] = "1단"
+                    elif self.vent_cont["speed"] == "medium":
+                        send_to_ha_sensor["fan_speed"] = "2단"
+                    elif self.vent_cont["speed"] == "high":
+                        send_to_ha_sensor["fan_speed"] = "3단"
+                    elif self.vent_cont["speed"] == "off":
+                        send_to_ha_sensor["fan_speed"] = "대기"
                 self.send_to_homeassistant(HA_SENSOR, send_to_ha_sensor)
 
     def make_control_packet(self, mode, speed):
