@@ -985,7 +985,8 @@ class Kocom(rs485):
                 if KOCOM_DEVICE.get(p["src_device"]) != DEVICE_WALLPAD
                 else KOCOM_DEVICE.get(p["dst_device"])
             )
-            if target_room == DEVICE_THERMOSTAT:
+
+            if target_device == DEVICE_THERMOSTAT:
                 target_room = (
                     KOCOM_ROOM_THERMOSTAT.get(p["src_room"])
                     if KOCOM_DEVICE.get(p["src_device"]) != DEVICE_WALLPAD
