@@ -1072,19 +1072,26 @@ class Kocom(rs485):
                 else:
                     target_device = "src_device"
 
-            if v[target_device] == DEVICE_ELEVATOR:
-                self.set_list(v[target_device], DEVICE_WALLPAD, v["value"])
-                self.send_to_homeassistant(v[target_device], DEVICE_WALLPAD, v["value"])
-            elif v[target_device] == DEVICE_FAN or v[target_device] == DEVICE_GAS:
-                self.set_list(v[target_device], DEVICE_WALLPAD, v["value"])
-                self.send_to_homeassistant(v[target_device], DEVICE_WALLPAD, v["value"])
-            elif (
-                v[target_device] == DEVICE_THERMOSTAT
-                or v[target_device] == DEVICE_LIGHT
-                or v[target_device] == DEVICE_PLUG
-            ):
-                self.set_list(v[target_device], v["src_room"], v["value"])
-                self.send_to_homeassistant(v[target_device], v["src_room"], v["value"])
+            if v["type"] == "ack":
+                if v[target_device] == DEVICE_ELEVATOR:
+                    self.set_list(v[target_device], DEVICE_WALLPAD, v["value"])
+                    self.send_to_homeassistant(
+                        v[target_device], DEVICE_WALLPAD, v["value"]
+                    )
+                elif v[target_device] == DEVICE_FAN or v[target_device] == DEVICE_GAS:
+                    self.set_list(v[target_device], DEVICE_WALLPAD, v["value"])
+                    self.send_to_homeassistant(
+                        v[target_device], DEVICE_WALLPAD, v["value"]
+                    )
+                elif (
+                    v[target_device] == DEVICE_THERMOSTAT
+                    or v[target_device] == DEVICE_LIGHT
+                    or v[target_device] == DEVICE_PLUG
+                ):
+                    self.set_list(v[target_device], v["src_room"], v["value"])
+                    self.send_to_homeassistant(
+                        v[target_device], v["src_room"], v["value"]
+                    )
         except Exception as e:
             logger.info(f"[{from_to} {name}]Error {packet} : {e}")
 
