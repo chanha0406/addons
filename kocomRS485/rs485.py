@@ -424,7 +424,9 @@ class Kocom(rs485):
                     return ""
             elif self.d_type == "socket":
                 return self.d_serial.recv(1)
-        except:
+        except Exception as e:
+            logger.error(f"ERROR : {e}")
+
             logging.info("[Serial Read] Connection Error")
 
     def write(self, data):
@@ -438,7 +440,9 @@ class Kocom(rs485):
                 return self.d_serial.write(bytearray.fromhex(data))
             elif self.d_type == "socket":
                 return self.d_serial.send(bytearray.fromhex(data))
-        except:
+        except Exception as e:
+            logger.error(f"ERROR : {e}")
+
             logging.info("[Serial Write] Connection Error")
 
     def connect_mqtt(self, server, name):
@@ -576,7 +580,9 @@ class Kocom(rs485):
                 logger.info(
                     f"[From HA]{device}/{room}/{sub_device}/{command} = {payload}"
                 )
-            except:
+            except Exception as e:
+                logger.error(f"ERROR : {e}")
+
                 logger.info(f"[From HA]Error {topic} = {payload}")
         elif device == HA_CLIMATE:
             device = DEVICE_THERMOSTAT
@@ -601,7 +607,9 @@ class Kocom(rs485):
                     f"[From HA]{device}/{room}/set = [mode={self.wp_list[device][room]['mode']['set'],}, target_temp={self.wp_list[device][room]['target_temp']['set']}]"
                 )
                 self.send_to_homeassistant(device, room, ha_payload)
-            except:
+            except Exception as e:
+                logger.error(f"ERROR : {e}")
+
                 logger.info(f"[From HA]Error {topic} = {payload}")
         elif device == HA_FAN:
             device = DEVICE_FAN
@@ -629,7 +637,9 @@ class Kocom(rs485):
                     f"[From HA]{device}/{room}/set = [mode={ self.wp_list[device][room]['mode']['set']}, speed={self.wp_list[device][room]['speed']['set']}]"
                 )
                 self.send_to_homeassistant(device, room, ha_payload)
-            except:
+            except Exception as e:
+                logger.error(f"ERROR : {e}")
+
                 logger.info(f"[From HA]Error {topic} = {payload}")
 
     def on_publish(self, client, obj, mid):
@@ -968,7 +978,9 @@ class Kocom(rs485):
             p["checksum"] = packet[36:38]
             p["tail"] = packet[38:42]
             return p
-        except:
+        except Exception as e:
+            logger.error(f"ERROR : {e}")
+
             return False
 
     def value_packet(self, p):
@@ -1017,7 +1029,9 @@ class Kocom(rs485):
                 v["value"] = v["command"]
 
             return v
-        except:
+        except Exception as e:
+            logger.error(f"ERROR : {e}")
+
             return False
 
     def packet_parsing(self, packet, name="kocom", from_to="From"):
@@ -1110,7 +1124,9 @@ class Kocom(rs485):
                         ]:
                             self.wp_list[device][room][sub]["last"] = "state"
                             self.wp_list[device][room][sub]["count"] = 0
-                    except:
+                    except Exception as e:
+                        logger.error(f"ERROR : {e}")
+
                         logger.info(
                             f"[From {name}]Error SetListDevice {device}/{room}/{sub}/state = {v}"
                         )
@@ -1132,7 +1148,9 @@ class Kocom(rs485):
                         ]:
                             self.wp_list[device][room][sub]["last"] = "state"
                             self.wp_list[device][room][sub]["count"] = 0
-                    except:
+                    except Exception as e:
+                        logger.error(f"ERROR : {e}")
+
                         logger.info(
                             f"[From {name}]Error SetListDevice {device}/{room}/{sub}/state = {v}"
                         )
@@ -1158,11 +1176,15 @@ class Kocom(rs485):
                         ]:
                             self.wp_list[device][room][sub]["last"] = "state"
                             self.wp_list[device][room][sub]["count"] = 0
-                    except:
+                    except Exception as e:
+                        logger.error(f"ERROR : {e}")
+
                         logger.info(
                             f"[From {name}]Error SetListDevice {device}/{room}/{sub}/state = {v}"
                         )
-        except:
+        except Exception as e:
+            logger.error(f"ERROR : {e}")
+
             logger.info(f"[From {name}]Error SetList {device}/{room} = {value}")
 
     def scan_list(self):
@@ -1241,7 +1263,9 @@ class Kocom(rs485):
                                                     ):
                                                         sub_v["last"] = "set"
                                                         sub_v["count"] += 1
-                    except:
+                    except Exception as e:
+                        logger.error(f"ERROR : {e}")
+
                         logger.debug("[Scan]Error")
             if not self.connected:
                 logger.debug(
@@ -1326,7 +1350,9 @@ class Kocom(rs485):
                                     p_value += "00"
                         else:
                             p_value += "ff" if value == "on" else "00"
-                except:
+                except Exception as e:
+                    logger.error(f"ERROR : {e}")
+
                     logger.debug("[Make Packet] Error on DEVICE_LIGHT or DEVICE_PLUG")
             elif device == DEVICE_THERMOSTAT:
                 try:
@@ -1341,7 +1367,9 @@ class Kocom(rs485):
                         p_value += "1101"
                     p_value += f"{int(float(target_temp)):02x}"
                     p_value += "0000000000"
-                except:
+                except Exception as e:
+                    logger.error(f"ERROR : {e}")
+
                     logger.debug("[Make Packet] Error on DEVICE_THERMOSTAT")
             elif device == DEVICE_FAN:
                 try:
@@ -1353,7 +1381,9 @@ class Kocom(rs485):
                         p_value += "0001"
                     p_value += KOCOM_FAN_SPEED_REV.get(speed)
                     p_value += "00000000000"
-                except:
+                except Exception as e:
+                    logger.error(f"ERROR : {e}")
+
                     logger.debug("[Make Packet] Error on DEVICE_THERMOSTAT")
         if p_value != "":
             packet = p_header + p_device + p_room + p_dst + p_cmd + p_value
@@ -1912,7 +1942,9 @@ if __name__ == "__main__":
                                 "name": _name,
                                 "length": 11,
                             }
-                    except:
+                    except Exception as e:
+                        logger.error(f"ERROR : {e}")
+
                         logger.info(f"[CONFIG] {_name} 초기화 실패")
         elif r._type == "socket":
             _name = r._device
