@@ -1062,12 +1062,12 @@ class Kocom(rs485):
             target = "src"
 
             if v["type"] == "ack":
-                if v["dst"] == DEVICE_WALLPAD:
+                if v["dst_device"] == DEVICE_WALLPAD:
                     target = "src"
                 else:
                     target = "dst"
             elif v["type"] == "send":
-                if v["dst"] == DEVICE_WALLPAD:
+                if v["dst_device"] == DEVICE_WALLPAD:
                     target = "dst"
                 else:
                     target = "src"
