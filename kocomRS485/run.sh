@@ -12,5 +12,4 @@ echo "[Info] Run Wallpad Controller"
 cd $SHARE_DIR
 python3 $SHARE_DIR/rs485.py
 
-# for dev
-while true; do echo "still live"; sleep 100; done
+exit 1
