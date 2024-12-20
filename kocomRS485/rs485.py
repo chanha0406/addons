@@ -1045,6 +1045,7 @@ class Kocom(rs485):
         logger.info(f"[{from_to} {name}] parse packet : {p}")
 
         try:
+
             if v["command"] == "조회" and v["src_device"] == DEVICE_WALLPAD:
                 if name == "HA":
                     self.write(
@@ -1061,12 +1062,12 @@ class Kocom(rs485):
             target_device = "src_device"
 
             if v["type"] == "ack":
-                if v["dst_device" == DEVICE_WALLPAD]:
+                if v["dst_device"] == DEVICE_WALLPAD:
                     target_device = "src_device"
                 else:
                     target_device = "dst_device"
             elif v["type"] == "send":
-                if v["dst_device" == DEVICE_WALLPAD]:
+                if v["dst_device"] == DEVICE_WALLPAD:
                     target_device = "dst_device"
                 else:
                     target_device = "src_device"
