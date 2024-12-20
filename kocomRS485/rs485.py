@@ -981,7 +981,7 @@ class Kocom(rs485):
         except Exception as e:
             logger.error(f"ERROR : {e}")
 
-            return False
+            raise e
 
     def value_packet(self, p):
         v = {}
@@ -1036,7 +1036,7 @@ class Kocom(rs485):
         except Exception as e:
             logger.error(f"ERROR : {e}")
 
-            return False
+            raise e
 
     def packet_parsing(self, packet, name="kocom", from_to="From"):
         p = self.parse_packet(packet)
