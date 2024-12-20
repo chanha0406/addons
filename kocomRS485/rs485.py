@@ -1072,7 +1072,7 @@ class Kocom(rs485):
                 else:
                     target_device = "src_device"
 
-            if v["type"] == "ack":
+            if v["command"] == "상태":
                 if v[target_device] == DEVICE_ELEVATOR:
                     self.set_list(v[target_device], DEVICE_WALLPAD, v["value"])
                     self.send_to_homeassistant(
