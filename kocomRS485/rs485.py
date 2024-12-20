@@ -992,6 +992,17 @@ class Kocom(rs485):
             v["command"] = KOCOM_COMMAND.get(p["command"])
             v["src_device"] = KOCOM_DEVICE.get(p["src_device"])
             v["dst_device"] = KOCOM_DEVICE.get(p["dst_device"])
+            v["src_room"] = (
+                KOCOM_ROOM.get(p["src_room"])
+                if v["src_device"] != DEVICE_THERMOSTAT
+                else KOCOM_ROOM_THERMOSTAT.get(p["src_room"])
+            )
+            v["dst_room"] = (
+                KOCOM_ROOM.get(p["dst_room"])
+                if v["dst_device"] != DEVICE_THERMOSTAT
+                else KOCOM_ROOM_THERMOSTAT.get(p["dst_room"])
+            )
+
             target_device = (
                 KOCOM_DEVICE.get(p["src_device"])
                 if KOCOM_DEVICE.get(p["src_device"]) != DEVICE_WALLPAD
@@ -999,20 +1010,12 @@ class Kocom(rs485):
                 else KOCOM_DEVICE.get(p["dst_device"])
             )
 
-            if target_device == DEVICE_THERMOSTAT:
-                target_room = (
-                    KOCOM_ROOM_THERMOSTAT.get(p["src_room"])
-                    if KOCOM_DEVICE.get(p["src_device"]) != DEVICE_WALLPAD
-                    and KOCOM_DEVICE.get(p["src_device"]) != None
-                    else KOCOM_ROOM_THERMOSTAT.get(p["dst_room"])
-                )
-            else:
-                target_room = (
-                    KOCOM_ROOM.get(p["src_room"])
-                    if KOCOM_DEVICE.get(p["src_device"]) != DEVICE_WALLPAD
-                    and KOCOM_DEVICE.get(p["src_device"]) != None
-                    else KOCOM_ROOM.get(p["dst_room"])
-                )
+            target_room = (
+                v["src_room"]
+                if KOCOM_DEVICE.get(p["src_device"]) != DEVICE_WALLPAD
+                and KOCOM_DEVICE.get(p["src_device"]) != None
+                else v["dst_room"]
+            )
 
             v["value"] = p["value"]
             if target_device == DEVICE_FAN:
