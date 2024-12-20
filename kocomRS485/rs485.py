@@ -1041,8 +1041,8 @@ class Kocom(rs485):
     def packet_parsing(self, packet, name="kocom", from_to="From"):
         p = self.parse_packet(packet)
         v = self.value_packet(p)
-        logger.info(f"[{from_to} {name}] raw packet : {packet}")
-        logger.info(f"[{from_to} {name}] parse packet : {p}")
+        logger.debug(f"[{from_to} {name}] raw packet : {packet}")
+        logger.debug(f"[{from_to} {name}] parse packet : {p}")
 
         try:
 
