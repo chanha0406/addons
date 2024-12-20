@@ -995,19 +995,22 @@ class Kocom(rs485):
             target_device = (
                 KOCOM_DEVICE.get(p["src_device"])
                 if KOCOM_DEVICE.get(p["src_device"]) != DEVICE_WALLPAD
+                and KOCOM_DEVICE.get(p["src_device"]) != None
                 else KOCOM_DEVICE.get(p["dst_device"])
             )
 
             if target_device == DEVICE_THERMOSTAT:
                 target_room = (
                     KOCOM_ROOM_THERMOSTAT.get(p["src_room"])
-                    if KOCOM_DEVICE.get(p["src_device"]) != DEVICE_WALLPAD
+                    if KOCOM_DEVICE.get(p["dst_room"]) != DEVICE_WALLPAD
+                    and KOCOM_DEVICE.get(p["src_device"]) != None
                     else KOCOM_ROOM_THERMOSTAT.get(p["dst_room"])
                 )
             else:
                 target_room = (
                     KOCOM_ROOM.get(p["src_room"])
                     if KOCOM_DEVICE.get(p["src_device"]) != DEVICE_WALLPAD
+                    and KOCOM_DEVICE.get(p["src_device"]) != None
                     else KOCOM_ROOM.get(p["dst_room"])
                 )
 
@@ -1015,13 +1018,11 @@ class Kocom(rs485):
             if target_device == DEVICE_FAN:
                 v["value"] = self.parse_fan(p["value"])
             elif target_device == DEVICE_LIGHT or target_device == DEVICE_PLUG:
-                v["value"] = self.parse_switch(
-                    target_device, v[target_room], p["value"]
-                )
+                v["value"] = self.parse_switch(target_device, target_room, p["value"])
             elif target_device == DEVICE_THERMOSTAT:
                 v["value"] = self.parse_thermostat(
                     p["value"],
-                    self.wp_list[target_device][v[target_room]]["target_temp"]["state"],
+                    self.wp_list[target_device][target_room]["target_temp"]["state"],
                 )
             elif target_device == DEVICE_ELEVATOR:
                 v["value"] = "off"
