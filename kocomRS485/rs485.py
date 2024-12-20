@@ -1018,6 +1018,7 @@ class Kocom(rs485):
         p = self.parse_packet(packet)
         v = self.value_packet(p)
         logger.info(f"[{from_to} {name}] raw packet : {packet}")
+        logger.info(f"[{from_to} {name}] parse packet : {p}")
 
         try:
             if v["command"] == "조회" and v["src_device"] == DEVICE_WALLPAD:
