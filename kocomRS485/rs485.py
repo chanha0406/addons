@@ -29,7 +29,7 @@ CONF_LOGLEVEL = "info"  # debug, info, warn
 
 # 보일러 초기값
 INIT_TEMP = 22
-# 환풍기 초기속도 ['low', 'medium', 'high']
+# 환풍기 초기속도 ["low', 'medium', 'high"]
 DEFAULT_SPEED = 2
 # 조명 / 플러그 갯수
 KOCOM_LIGHT_SIZE = {"livingroom": 5, "bedroom": 0, "room1": 0, "room2": 0, "kitchen": 0}
@@ -684,7 +684,7 @@ class Kocom(rs485):
             }
             subscribe_list.append((ha_topic, 0))
             subscribe_list.append((ha_payload["command_topic"], 0))
-            # subscribe_list.append((ha_payload['state_topic'], 0))
+            # subscribe_list.append((ha_payload["state_topic"], 0))
             if remove:
                 publish_list.append({ha_topic: ""})
             else:
@@ -710,7 +710,7 @@ class Kocom(rs485):
             }
             subscribe_list.append((ha_topic, 0))
             subscribe_list.append((ha_payload["command_topic"], 0))
-            # subscribe_list.append((ha_payload['state_topic'], 0))
+            # subscribe_list.append((ha_payload["state_topic"], 0))
             if remove:
                 publish_list.append({ha_topic: ""})
             else:
@@ -732,7 +732,7 @@ class Kocom(rs485):
                 },
             }
             subscribe_list.append((ha_topic, 0))
-            # subscribe_list.append((ha_payload['state_topic'], 0))
+            # subscribe_list.append((ha_payload["state_topic"], 0))
             publish_list.append({ha_topic: json.dumps(ha_payload)})
         if self.wp_fan:
             ha_topic = f"{HA_PREFIX}/{HA_FAN}/wallpad_{DEVICE_FAN}/config"
@@ -758,7 +758,7 @@ class Kocom(rs485):
             }
             subscribe_list.append((ha_topic, 0))
             subscribe_list.append((ha_payload["command_topic"], 0))
-            # subscribe_list.append((ha_payload['state_topic'], 0))
+            # subscribe_list.append((ha_payload["state_topic"], 0))
             subscribe_list.append((ha_payload["percentage_command_topic"], 0))
             if remove:
                 publish_list.append({ha_topic: ""})
@@ -792,7 +792,7 @@ class Kocom(rs485):
                             }
                             subscribe_list.append((ha_topic, 0))
                             subscribe_list.append((ha_payload["command_topic"], 0))
-                            # subscribe_list.append((ha_payload['state_topic'], 0))
+                            # subscribe_list.append((ha_payload["state_topic"], 0))
                             if remove:
                                 publish_list.append({ha_topic: ""})
                             else:
@@ -826,7 +826,7 @@ class Kocom(rs485):
                             }
                             subscribe_list.append((ha_topic, 0))
                             subscribe_list.append((ha_payload["command_topic"], 0))
-                            # subscribe_list.append((ha_payload['state_topic'], 0))
+                            # subscribe_list.append((ha_payload["state_topic"], 0))
                             if remove:
                                 publish_list.append({ha_topic: ""})
                             else:
@@ -848,7 +848,7 @@ class Kocom(rs485):
                         "min_temp": 5,
                         "max_temp": 40,
                         "temp_step": 1,
-                        "modes": ['off", "heat", "fan_only'],
+                        "modes": ["off", "heat", "fan_only"],
                         "uniq_id": f"{self._name}_{room}_{DEVICE_THERMOSTAT}",
                         "device": {
                             "name": f"Kocom {room}",
@@ -860,9 +860,9 @@ class Kocom(rs485):
                     }
                     subscribe_list.append((ha_topic, 0))
                     subscribe_list.append((ha_payload["mode_command_topic"], 0))
-                    # subscribe_list.append((ha_payload['mode_state_topic'], 0))
+                    # subscribe_list.append((ha_payload["mode_state_topic"], 0))
                     subscribe_list.append((ha_payload["temperature_command_topic"], 0))
-                    # subscribe_list.append((ha_payload['temperature_state_topic'], 0))
+                    # subscribe_list.append((ha_payload["temperature_state_topic"], 0))
                     if remove:
                         publish_list.append({ha_topic: ""})
                     else:
@@ -1516,7 +1516,7 @@ class Grex:
             "preset_mode_command_topic": f"{HA_PREFIX}/{HA_FAN}/grex/speed",
             "preset_mode_state_topic": f"{HA_PREFIX}/{HA_FAN}/grex/state",
             "preset_mode_template": "{{ value_json.speed }}",
-            "preset_modes": ['low", "medium", "high", "off'],
+            "preset_modes": ["low", "medium", "high", "off"],
             "uniq_id": f"{self._name}_grex_{DEVICE_FAN}",
             "device": {
                 "name": "Grex Ventilator",
@@ -1529,7 +1529,7 @@ class Grex:
         subscribe_list.append((ha_topic, 0))
         subscribe_list.append((ha_payload["command_topic"], 0))
         subscribe_list.append((ha_payload["preset_mode_command_topic"], 0))
-        # subscribe_list.append((ha_payload['state_topic'], 0))
+        # subscribe_list.append((ha_payload["state_topic"], 0))
         publish_list.append({ha_topic: json.dumps(ha_payload)})
 
         ha_topic = f"{HA_PREFIX}/{HA_SENSOR}/grex_{DEVICE_FAN}_mode/config"
@@ -1548,7 +1548,7 @@ class Grex:
             },
         }
         subscribe_list.append((ha_topic, 0))
-        # subscribe_list.append((ha_payload['state_topic'], 0))
+        # subscribe_list.append((ha_payload["state_topic"], 0))
         publish_list.append({ha_topic: json.dumps(ha_payload)})
         ha_topic = f"{HA_PREFIX}/{HA_SENSOR}/grex_{DEVICE_FAN}_speed/config"
         ha_payload = {
@@ -1566,7 +1566,7 @@ class Grex:
             },
         }
         subscribe_list.append((ha_topic, 0))
-        # subscribe_list.append((ha_payload['state_topic'], 0))
+        # subscribe_list.append((ha_payload["state_topic"], 0))
         publish_list.append({ha_topic: json.dumps(ha_payload)})
 
         if initial:
@@ -1871,7 +1871,7 @@ if __name__ == "__main__":
 
     if DEFAULT_SPEED not in [1, 2, 3]:
         logger.info(
-            f"[Error] DEFAULT_SPEED 설정오류로 medium 으로 설정. {DEFAULT_SPEED} -> medium"
+            f"[Error] DEFAULT_SPEED 설정오류로 medium 으로 설정. {DEFAULT_SPEED} -> 2"
         )
         DEFAULT_SPEED = 2
 
