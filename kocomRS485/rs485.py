@@ -1034,28 +1034,32 @@ class Kocom(rs485):
                     f"[{from_to} {name}]{v['type']}({v['command']}) {v['src_device']}({v['src_room']}) -> {v['dst_device']}({v['dst_room']}) = {v['value']}"
                 )
 
-            if (v["type"] == "ack" and v["dst_device"] == DEVICE_WALLPAD) or (
-                v["type"] == "send" and v["dst_device"] == DEVICE_ELEVATOR
+            target_device = "src_device"
+
+            if v["type"] == "ack":
+                if v["dst_device" == DEVICE_WALLPAD]:
+                    target_device = "src_device"
+                else:
+                    target_device = "dst_device"
+            elif v["type"] == "send":
+                if v["dst_device" == DEVICE_WALLPAD]:
+                    target_device = "dst_device"
+                else:
+                    target_device = "src_device"
+
+            if v[target_device] == DEVICE_ELEVATOR:
+                self.set_list(v[target_device], DEVICE_WALLPAD, v["value"])
+                self.send_to_homeassistant(v[target_device], DEVICE_WALLPAD, v["value"])
+            elif v[target_device] == DEVICE_FAN or v[target_device] == DEVICE_GAS:
+                self.set_list(v[target_device], DEVICE_WALLPAD, v["value"])
+                self.send_to_homeassistant(v[target_device], DEVICE_WALLPAD, v["value"])
+            elif (
+                v[target_device] == DEVICE_THERMOSTAT
+                or v[target_device] == DEVICE_LIGHT
+                or v[target_device] == DEVICE_PLUG
             ):
-                if v["type"] == "send" and v["dst_device"] == DEVICE_ELEVATOR:
-                    self.set_list(v["dst_device"], DEVICE_WALLPAD, v["value"])
-                    self.send_to_homeassistant(
-                        v["dst_device"], DEVICE_WALLPAD, v["value"]
-                    )
-                elif v["src_device"] == DEVICE_FAN or v["src_device"] == DEVICE_GAS:
-                    self.set_list(v["src_device"], DEVICE_WALLPAD, v["value"])
-                    self.send_to_homeassistant(
-                        v["src_device"], DEVICE_WALLPAD, v["value"]
-                    )
-                elif (
-                    v["src_device"] == DEVICE_THERMOSTAT
-                    or v["src_device"] == DEVICE_LIGHT
-                    or v["src_device"] == DEVICE_PLUG
-                ):
-                    self.set_list(v["src_device"], v["src_room"], v["value"])
-                    self.send_to_homeassistant(
-                        v["src_device"], v["src_room"], v["value"]
-                    )
+                self.set_list(v[target_device], v["src_room"], v["value"])
+                self.send_to_homeassistant(v[target_device], v["src_room"], v["value"])
         except:
             logger.info(f"[{from_to} {name}]Error {packet}")
 
