@@ -446,7 +446,7 @@ class Kocom(rs485):
             logging.info("[Serial Write] Connection Error")
 
     def connect_mqtt(self, server, name):
-        mqtt_client = mqtt.Client()
+        mqtt_client = mqtt.Client(callback_api_version=mqtt.CallbackAPIVersion.VERSION2, protocol=mqtt.MQTTv5)
         mqtt_client.on_message = self.on_message
         # mqtt_client.on_publish = self.on_publish
         mqtt_client.on_subscribe = self.on_subscribe
@@ -477,7 +477,7 @@ class Kocom(rs485):
         mqtt_client.loop_start()
         return mqtt_client
 
-    def on_message(self, client, obj, msg):
+    def on_message(self, client, obj, msg, properties=None):
         _topic = msg.topic.split("/")
         _payload = msg.payload.decode()
 
@@ -645,22 +645,22 @@ class Kocom(rs485):
     def on_publish(self, client, obj, mid):
         logger.info(f"Publish: {str(mid)}")
 
-    def on_subscribe(self, client, obj, mid, granted_qos):
+    def on_subscribe(self, client, obj, mid, granted_qos, properties=None):
         logger.info(f"Subscribed: {str(mid)} {str(granted_qos)}")
 
-    def on_connect(self, client, userdata, flags, rc):
-        if int(rc) == 0:
+    def on_connect(self, client, userdata, flags, rc, properties=None):
+        if int(rc.value) == 0:
             logger.info("[MQTT] connected OK")
             self.homeassistant_device_discovery(initial=True)
-        elif int(rc) == 1:
+        elif int(rc.value) == 1:
             logger.info("[MQTT] 1: Connection refused – incorrect protocol version")
-        elif int(rc) == 2:
+        elif int(rc.value) == 2:
             logger.info("[MQTT] 2: Connection refused – invalid client identifier")
-        elif int(rc) == 3:
+        elif int(rc.value) == 3:
             logger.info("[MQTT] 3: Connection refused – server unavailable")
-        elif int(rc) == 4:
+        elif int(rc.value) == 4:
             logger.info("[MQTT] 4: Connection refused – bad username or password")
-        elif int(rc) == 5:
+        elif int(rc.value) == 5:
             logger.info("[MQTT] 5: Connection refused – not authorised")
         else:
             logger.info(f"[MQTT] {rc} : Connection refused")
@@ -1513,7 +1513,7 @@ class Grex:
         mqtt_client.loop_start()
         return mqtt_client
 
-    def on_message(self, client, obj, msg):
+    def on_message(self, client, obj, msg, properties=None):
         _topic = msg.topic.split("/")
         _payload = msg.payload.decode()
 
@@ -1539,10 +1539,10 @@ class Grex:
     def on_publish(self, client, obj, mid):
         logger.info(f"Publish: {str(mid)}")
 
-    def on_subscribe(self, client, obj, mid, granted_qos):
+    def on_subscribe(self, client, obj, mid, granted_qos, properties=None):
         logger.info(f"Subscribed: {str(mid)} {str(granted_qos)}")
 
-    def on_connect(self, client, userdata, flags, rc):
+    def on_connect(self, client, userdata, flags, rc, properties=None):
         if int(rc) == 0:
             logger.info("MQTT connected OK")
             self.homeassistant_device_discovery(initial=True)
