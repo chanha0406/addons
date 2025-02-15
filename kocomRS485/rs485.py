@@ -30,7 +30,7 @@ CONF_LOGLEVEL = "info"  # debug, info, warn
 # 보일러 초기값
 INIT_TEMP = 22
 # 환풍기 초기속도 ["low', 'medium', 'high"]
-DEFAULT_SPEED = 2
+DEFAULT_SPEED = 0
 # 조명 / 플러그 갯수
 KOCOM_LIGHT_SIZE = {"livingroom": 5, "bedroom": 0, "room1": 0, "room2": 0, "kitchen": 0}
 KOCOM_PLUG_SIZE = {"livingroom": 0, "bedroom": 0, "room1": 0, "room2": 0, "kitchen": 0}
@@ -53,7 +53,7 @@ KOCOM_ROOM_THERMOSTAT = {
 }
 
 # TIME 변수(초)
-SCAN_INTERVAL = 300  # 월패드의 상태값 조회 간격
+SCAN_INTERVAL = 60  # 월패드의 상태값 조회 간격
 SCANNING_INTERVAL = 0.8  # 상태값 조회 시 패킷전송 간격
 ####################### Start Here by Zooil ###########################
 option_file = "/data/options.json"
@@ -428,6 +428,8 @@ class Kocom(rs485):
             logger.error(f"ERROR : {e}")
 
             logging.info("[Serial Read] Connection Error")
+            
+            raise e
 
     def write(self, data):
         if data == False:
@@ -444,6 +446,8 @@ class Kocom(rs485):
             logger.error(f"ERROR : {e}")
 
             logging.info("[Serial Write] Connection Error")
+            
+            raise e
 
     def connect_mqtt(self, server, name):
         mqtt_client = mqtt.Client(callback_api_version=mqtt.CallbackAPIVersion.VERSION2, protocol=mqtt.MQTTv5)
@@ -584,6 +588,8 @@ class Kocom(rs485):
                 logger.error(f"ERROR : {e}")
 
                 logger.info(f"[From HA]Error {topic} = {payload}")
+                
+                raise e
         elif device == HA_CLIMATE:
             device = DEVICE_THERMOSTAT
             room = topic[2]
@@ -611,6 +617,8 @@ class Kocom(rs485):
                 logger.error(f"ERROR : {e}")
 
                 logger.info(f"[From HA]Error {topic} = {payload}")
+                
+                raise e
         elif device == HA_FAN:
             device = DEVICE_FAN
             room = topic[2]
@@ -641,6 +649,8 @@ class Kocom(rs485):
                 logger.error(f"ERROR : {e}")
 
                 logger.info(f"[From HA]Error {topic} = {payload}")
+                
+                raise e
 
     def on_publish(self, client, obj, mid):
         logger.info(f"Publish: {str(mid)}")
@@ -1147,6 +1157,8 @@ class Kocom(rs485):
                         logger.info(
                             f"[From {name}]Error SetListDevice {device}/{room}/{sub}/state = {v}"
                         )
+                        
+                        raise e
             elif device == DEVICE_LIGHT or device == DEVICE_PLUG:
                 for sub, v in value.items():
                     try:
@@ -1171,6 +1183,8 @@ class Kocom(rs485):
                         logger.info(
                             f"[From {name}]Error SetListDevice {device}/{room}/{sub}/state = {v}"
                         )
+                        
+                        raise e
             elif device == DEVICE_THERMOSTAT:
                 for sub, v in value.items():
                     try:
@@ -1199,10 +1213,14 @@ class Kocom(rs485):
                         logger.info(
                             f"[From {name}]Error SetListDevice {device}/{room}/{sub}/state = {v}"
                         )
+                        
+                        raise e
         except Exception as e:
             logger.error(f"ERROR : {e}")
 
             logger.info(f"[From {name}]Error SetList {device}/{room} = {value}")
+            
+            raise e
 
     def scan_list(self):
         while True:
@@ -1284,6 +1302,8 @@ class Kocom(rs485):
                         logger.error(f"ERROR : {e}")
 
                         logger.debug("[Scan]Error")
+                        
+                        raise e
             if not self.connected:
                 logger.debug(
                     "[ERROR] 서버 연결이 끊어져 scan_list Thread를 종료합니다."
@@ -1371,6 +1391,8 @@ class Kocom(rs485):
                     logger.error(f"ERROR : {e}")
 
                     logger.debug("[Make Packet] Error on DEVICE_LIGHT or DEVICE_PLUG")
+                    
+                    raise e
             elif device == DEVICE_THERMOSTAT:
                 try:
                     mode = self.wp_list[device][room]["mode"]["set"]
@@ -1388,6 +1410,8 @@ class Kocom(rs485):
                     logger.error(f"ERROR : {e}")
 
                     logger.debug("[Make Packet] Error on DEVICE_THERMOSTAT")
+                    
+                    raise e
             elif device == DEVICE_FAN:
                 try:
                     mode = self.wp_list[device][room]["mode"]["set"]
@@ -1402,6 +1426,8 @@ class Kocom(rs485):
                     logger.error(f"ERROR : {e}")
 
                     logger.debug("[Make Packet] Error on DEVICE_THERMOSTAT")
+                    
+                    raise e
         if p_value != "":
             packet = p_header + p_device + p_room + p_dst + p_cmd + p_value
             chk_sum = self.check_sum(packet)[1]
@@ -1963,6 +1989,8 @@ if __name__ == "__main__":
                         logger.error(f"ERROR : {e}")
 
                         logger.info(f"[CONFIG] {_name} 초기화 실패")
+                        
+                        raise e
         elif r._type == "socket":
             _name = r._device
             if _name == "kocom":

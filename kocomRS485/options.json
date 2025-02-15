@@ -1,0 +1,79 @@
+{
+  "RS485": {
+    "type": "Socket"
+  },
+  "Socket": {
+    "server": "192.168.1.143",
+    "port": 8899
+  },
+  "SocketDevice": {
+    "device": "kocom"
+  },
+  "MQTT": {
+    "anonymous": true,
+    "server": "mqtt"
+  },
+  "Wallpad": {
+    "light": true,
+    "plug": false,
+    "thermostat": true,
+    "fan": true,
+    "gas": false,
+    "elevator": false
+  },
+  "Advanced": {
+    "INIT_TEMP": 22,
+    "SCAN_INTERVAL": 300,
+    "SCANNING_INTERVAL": 0.8,
+    "DEFAULT_SPEED" : "2",
+    "LOGLEVEL" : "info"
+  },
+  "KOCOM_LIGHT_SIZE": [
+    {
+      "name": "livingroom",
+      "number": 5
+    },
+    {
+      "name": "bedroom",
+      "number": 0
+    },
+    {
+      "name": "dressroom",
+      "number": 0
+    },
+    {
+      "name": "study",
+      "number": 0
+    }
+  ],
+  "KOCOM_PLUG_SIZE": [
+    {
+      "name": "livingroom",
+      "number": 0
+    },
+    {
+      "name": "bedroom",
+      "number": 0
+    },
+    {
+      "name": "dressroom",
+      "number": 0
+    },
+    {
+      "name": "study",
+      "number": 0
+    }
+  ],
+  "KOCOM_ROOM": [
+    "livingroom",
+    "bedroom",
+    "dressroom",
+    "study"
+  ],
+  "KOCOM_ROOM_THERMOSTAT": [
+    "livingroom",
+    "bedroom",
+    "dressroom",
+    "study"
+  ]
+}
